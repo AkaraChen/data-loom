@@ -19,9 +19,14 @@
       />
 
       <!-- Action Button -->
-      <button class="btn btn-primary w-full gap-2">
-        <Icon name="mdi:play-circle-outline" size="20" />
-        生成
+      <button
+        class="btn btn-primary w-full gap-2"
+        @click="generateContent"
+        :disabled="isStreaming"
+      >
+        <Icon v-if="!isStreaming" name="mdi:play-circle-outline" size="20" />
+        <span v-else class="loading loading-spinner loading-sm"></span>
+        {{ isStreaming ? '生成中...' : '生成' }}
       </button>
     </div>
 
@@ -31,12 +36,14 @@
       v-model:activeFileId="activeFileId"
       v-model:activeFileContent="activeFileContent"
       @process="processDocument"
+      :blocking="isStreaming"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useChat } from '~/composables/use-chat'
 import type { DocumentFile } from '~/composables/use-editor-model'
 
 definePageMeta({
@@ -56,6 +63,55 @@ const activeFileId = ref<string | null>(null)
 const activeFileContent = ref<string>(
   '这是一个示例文档，你可以在这里编辑内容。',
 )
+
+// 初始化聊天功能
+const {
+  sendMessage,
+  isStreaming,
+  streamedText,
+  abortChat,
+  reset: resetChat,
+} = useChat({
+  onUpdate: text => {
+    // 实时更新活动文件内容
+    if (activeFileId.value) {
+      activeFileContent.value = text
+    }
+  },
+})
+
+// 生成内容
+const generateContent = async () => {
+  if (!activeFileId.value) {
+    // 如果没有活动文件，创建一个新文件
+    const newFile: DocumentFile = {
+      id: `file-${Date.now()}`,
+      name: '生成的文档.md',
+      content: '',
+    }
+
+    files.value.push(newFile)
+    activeFileId.value = newFile.id
+  }
+
+  // 重置聊天内容
+  resetChat()
+
+  // 构建提示词
+  const prompt = `
+任务描述: ${taskDescription.value}
+要求: ${requirements.value}
+
+请根据以上信息生成内容。
+`
+
+  // 发送消息到 OpenAI
+  sendMessage({
+    content: prompt,
+    systemPrompt:
+      '你是一个专业的内容生成助手，擅长根据用户的要求生成高质量的文档内容。',
+  })
+}
 
 // 处理文档
 const processDocument = (file: DocumentFile) => {

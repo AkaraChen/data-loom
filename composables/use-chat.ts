@@ -67,6 +67,7 @@ export function useChat(options: ChatOptions = {}) {
 
     const clientOptions: ClientOptions = {
       apiKey,
+      dangerouslyAllowBrowser: true,
     }
 
     // Use custom API endpoint if provided
