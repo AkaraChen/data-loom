@@ -72,7 +72,11 @@
 
       <!-- Editor Content -->
       <div class="flex-1 overflow-auto bg-base-100 p-0.5 font-mono text-sm">
-        <div v-if="isPreviewMode && activeFile" v-html="marked(activeFileContent)" class="markdown-body"></div>
+        <EditorContentPreview 
+          v-if="isPreviewMode && activeFile" 
+          v-model="activeFileContent"
+          :fileType="getFileExtension(activeFile?.name || '')"
+        />
         <textarea
           v-else-if="activeFile"
           class="textarea !border-transparent !outline-none w-full h-full"
@@ -121,6 +125,7 @@
 <script setup lang="ts">
 import { computed, watch, ref, reactive } from 'vue'
 import {marked} from 'marked'
+import EditorContentPreview from './content-preview.vue'
 
 // 文档文件接口
 interface DocumentFile {
@@ -373,6 +378,13 @@ const isPreviewMode = ref(false)
 // 切换预览模式
 const togglePreviewMode = () => {
   isPreviewMode.value = !isPreviewMode.value
+}
+
+// 获取文件扩展名
+const getFileExtension = (fileName: string): string => {
+  const lastDotIndex = fileName.lastIndexOf('.')
+  if (lastDotIndex === -1) return 'txt'
+  return fileName.substring(lastDotIndex + 1).toLowerCase()
 }
 </script>
 
