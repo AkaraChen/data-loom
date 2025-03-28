@@ -106,7 +106,7 @@ export function useChat(options: ChatOptions = {}) {
 
         // Create the stream
         const stream = await openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
+          model: settingsStore.model || 'gpt-3.5-turbo',
           messages,
           stream: true,
         })

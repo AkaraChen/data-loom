@@ -31,6 +31,18 @@
         </SettingsItem>
 
         <SettingsItem
+          title="模型"
+          description="选择要使用的模型（留空则使用默认模型）"
+        >
+          <input
+            type="text"
+            v-model="settingsStore.model"
+            placeholder="例如：gpt-4-turbo"
+            class="input input-bordered input-sm w-full"
+          />
+        </SettingsItem>
+
+        <SettingsItem
           title="API Key"
           description="输入你的 API Key 以访问所选供应商的服务"
         >
