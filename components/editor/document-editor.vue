@@ -19,7 +19,8 @@
           :key="file.id"
           :fileName="file.name"
           :isActive="activeFileId === file.id"
-          @click="activeFileId = file.id"
+          :disabled="blocking"
+          @click="handleFileSelect(file.id)"
         />
       </ul>
     </div>
@@ -83,8 +84,16 @@
 import { computed, watch, ref } from 'vue'
 import { useEditorModel, type DocumentFile } from '~/composables/use-editor-model'
 
+// 定义属性
+const props = defineProps({
+  blocking: {
+    type: Boolean,
+    default: false
+  }
+})
+
 // 定义事件
-const emit = defineEmits(['process'])
+const emit = defineEmits(['process', 'fileSelectBlocked'])
 
 // 使用 defineModel 暴露接口
 const files = defineModel<DocumentFile[]>('files', { default: () => [] })
@@ -93,6 +102,18 @@ const activeFileContent = defineModel<string>('activeFileContent', { default: ''
 
 // 新建文件对话框引用
 const newFileDialog = ref<{ open: () => void } | null>(null)
+
+// 处理文件选择
+const handleFileSelect = (fileId: string) => {
+  if (props.blocking) {
+    // 如果处于阻塞状态，发出事件但不更新活动文件
+    emit('fileSelectBlocked', fileId)
+    return
+  }
+  
+  // 非阻塞状态，正常更新活动文件
+  activeFileId.value = fileId
+}
 
 // 显示新建文件对话框
 const showNewFileDialog = () => {
@@ -109,7 +130,13 @@ const createNewFile = (fileName: string) => {
   }
   
   files.value = [...files.value, newFile]
-  activeFileId.value = newId
+  
+  // 只有在非阻塞状态下才更新活动文件ID
+  if (!props.blocking) {
+    activeFileId.value = newId
+  } else {
+    emit('fileSelectBlocked', newId)
+  }
 }
 
 // 使用编辑器模型
@@ -128,7 +155,10 @@ watch(() => editorModel.files.value, (newFiles) => {
 }, { immediate: true })
 
 watch(() => editorModel.activeFileId.value, (newActiveFileId) => {
-  activeFileId.value = newActiveFileId
+  // 只有在非阻塞状态下才更新活动文件ID
+  if (!props.blocking) {
+    activeFileId.value = newActiveFileId
+  }
 }, { immediate: true })
 
 watch(() => editorModel.activeFileContent.value, (newContent) => {
