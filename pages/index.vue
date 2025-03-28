@@ -39,7 +39,9 @@
       v-model:files="workspaceStore.files"
       v-model:activeFileId="workspaceStore.activeFileId"
       v-model:activeFileContent="workspaceStore.activeFileContent"
+      v-model:contextFileIds="workspaceStore.contextFileIds"
       :blocking="workspaceStore.isStreaming"
+      @process="handleProcessFile"
       @fileSelectBlocked="handleFileSelectBlocked"
     />
   </div>
@@ -47,7 +49,7 @@
 
 <script setup lang="ts">
 import { useChat } from '~/composables/use-chat'
-import { useWorkspaceStore } from '~/stores/workspace'
+import { useWorkspaceStore, type DocumentFile } from '~/stores/workspace'
 import { watch } from 'vue'
 
 definePageMeta({
@@ -79,6 +81,22 @@ watch(
     workspaceStore.isStreaming = newValue
   },
 )
+
+// 处理文件处理请求
+const handleProcessFile = (file: DocumentFile) => {
+  // 重置聊天内容
+  resetChat()
+
+  // 获取提示词
+  const prompt = workspaceStore.getPrompt()
+
+  // 发送消息到 OpenAI
+  sendMessage({
+    content: prompt,
+    systemPrompt:
+      '你是一个专业的内容生成助手，擅长根据用户的要求生成高质量的文档内容。',
+  })
+}
 
 // 生成内容
 const generateContent = async () => {

@@ -23,12 +23,29 @@
           :fileName="file.name"
           :isActive="activeFileId === file.id"
           :disabled="blocking"
+          v-model:checked="fileContextMap[file.id]"
           @click="handleFileSelect(file.id)"
           @delete="handleDeleteFile(file.id)"
           @rename="handleRenameFile(file.id)"
           @duplicate="handleDuplicateFile(file.id)"
         />
       </ul>
+
+      <!-- Context Files Section (if any files are selected) -->
+      <div v-if="contextFiles.length > 0" class="mt-4">
+        <h3 class="font-medium flex items-center gap-2 mb-2">
+          <Icon name="mdi:link-variant" size="16" class="text-primary" />
+          上下文文件
+        </h3>
+        <div class="text-xs text-base-content/70 mb-2">
+          已选择 {{ contextFiles.length }} 个文件作为上下文
+        </div>
+        <ul class="menu menu-compact w-full p-0 bg-base-200 rounded-box">
+          <li v-for="file in contextFiles" :key="file.id" class="text-xs py-1 px-2">
+            {{ file.name }}
+          </li>
+        </ul>
+      </div>
     </div>
 
     <!-- File Content -->
@@ -87,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch, ref } from 'vue'
+import { computed, watch, ref, reactive } from 'vue'
 
 // 文档文件接口
 interface DocumentFile {
@@ -114,6 +131,48 @@ const activeFileId = defineModel<string | null>('activeFileId', {
 })
 const activeFileContent = defineModel<string>('activeFileContent', {
   default: '',
+})
+const contextFileIds = defineModel<string[]>('contextFileIds', { default: () => [] })
+
+// 文件上下文映射表，用于跟踪每个文件的选中状态
+const fileContextMap = reactive<Record<string, boolean>>({})
+
+// 监听文件列表变化，更新映射表
+watch(files, newFiles => {
+  // 添加新文件到映射表
+  newFiles.forEach(file => {
+    if (fileContextMap[file.id] === undefined) {
+      fileContextMap[file.id] = contextFileIds.value.includes(file.id)
+    }
+  })
+  
+  // 移除不存在的文件
+  Object.keys(fileContextMap).forEach(fileId => {
+    if (!newFiles.some(file => file.id === fileId)) {
+      delete fileContextMap[fileId]
+    }
+  })
+}, { immediate: true, deep: true })
+
+// 监听映射表变化，更新上下文文件ID数组
+watch(fileContextMap, newMap => {
+  const selectedIds = Object.entries(newMap)
+    .filter(([_, checked]) => checked)
+    .map(([id]) => id)
+  
+  contextFileIds.value = selectedIds
+}, { deep: true })
+
+// 监听上下文文件ID数组变化，更新映射表
+watch(contextFileIds, newIds => {
+  files.value.forEach(file => {
+    fileContextMap[file.id] = newIds.includes(file.id)
+  })
+}, { deep: true })
+
+// 计算当前上下文文件列表
+const contextFiles = computed(() => {
+  return files.value.filter(file => contextFileIds.value.includes(file.id))
 })
 
 // 新建文件对话框引用
@@ -161,6 +220,7 @@ const createNewFile = (fileName: string) => {
   }
 
   files.value = [...files.value, newFile]
+  fileContextMap[newId] = false // 初始化新文件的上下文状态
 
   // 只有在非阻塞状态下才更新活动文件ID
   if (!props.blocking) {
@@ -203,10 +263,21 @@ const handleProcessFile = () => {
 
 // 删除文件
 const handleDeleteFile = (fileId: string) => {
-  files.value = files.value.filter(file => file.id !== fileId)
+  // 如果删除的是当前活动文件，先清空活动文件ID
   if (activeFileId.value === fileId) {
     activeFileId.value = null
   }
+
+  // 从文件列表中移除
+  files.value = files.value.filter(file => file.id !== fileId)
+  
+  // 从上下文文件ID数组中移除
+  if (contextFileIds.value.includes(fileId)) {
+    contextFileIds.value = contextFileIds.value.filter(id => id !== fileId)
+  }
+  
+  // 从映射表中移除
+  delete fileContextMap[fileId]
 }
 
 // 重命名文件
@@ -214,32 +285,19 @@ const handleRenameFile = (fileId: string) => {
   const file = files.value.find(f => f.id === fileId)
   if (!file) return
 
-  // 解析文件名和扩展名
-  const fileNameParts = file.name.split('.')
-  const extension = fileNameParts.length > 1 ? fileNameParts.pop() || '' : ''
-  const currentBaseName = fileNameParts.join('.')
+  // 使用 prompt 获取新文件名
+  const newName = prompt('输入新文件名:', file.name)
+  if (!newName || newName === file.name) return
 
-  const newBaseName = prompt('输入新文件名（不包含扩展名）', currentBaseName)
-  
-  if (newBaseName && newBaseName.trim()) {
-    // 检查用户输入是否包含扩展名
-    if (newBaseName.includes('.')) {
-      alert('请不要输入扩展名，只需输入文件名')
-      return
+  // 更新文件名
+  const fileIndex = files.value.findIndex(f => f.id === fileId)
+  if (fileIndex !== -1) {
+    const updatedFiles = [...files.value]
+    updatedFiles[fileIndex] = {
+      ...updatedFiles[fileIndex],
+      name: newName,
     }
-    
-    // 构建新的完整文件名（保留原扩展名）
-    const finalName = extension ? `${newBaseName.trim()}.${extension}` : newBaseName.trim()
-    
-    const fileIndex = files.value.findIndex(f => f.id === fileId)
-    if (fileIndex !== -1) {
-      const updatedFiles = [...files.value]
-      updatedFiles[fileIndex] = {
-        ...updatedFiles[fileIndex],
-        name: finalName,
-      }
-      files.value = updatedFiles
-    }
+    files.value = updatedFiles
   }
 }
 
@@ -248,44 +306,34 @@ const handleDuplicateFile = (fileId: string) => {
   const file = files.value.find(f => f.id === fileId)
   if (!file) return
 
-  // 解析文件名和扩展名
-  const fileNameParts = file.name.split('.')
-  const extension = fileNameParts.length > 1 ? fileNameParts.pop() || '' : ''
-  const baseName = fileNameParts.join('.')
+  // 创建新文件名 (添加 "副本" 后缀)
+  let baseName = file.name
+  const lastDotIndex = baseName.lastIndexOf('.')
+  let extension = ''
   
-  // 检查文件名中是否已经包含"复制"字样
-  const copyRegex = /\(复制(?:\s*\d*)?\)$/
-  const hasCopyText = copyRegex.test(baseName)
-  
-  let newName
-  if (hasCopyText) {
-    // 如果已经有"复制"字样，则添加数字或增加数字
-    const match = baseName.match(/\(复制(?:\s*(\d+))?\)$/)
-    const copyNumber = match && match[1] ? parseInt(match[1], 10) + 1 : 1
-    const baseNameWithoutCopy = baseName.replace(copyRegex, '').trim()
-    newName = copyNumber > 1 
-      ? `${baseNameWithoutCopy} (复制 ${copyNumber})` 
-      : `${baseNameWithoutCopy} (复制 1)`
-  } else {
-    // 如果没有"复制"字样，则添加
-    newName = `${baseName} (复制)`
+  if (lastDotIndex !== -1) {
+    extension = baseName.substring(lastDotIndex)
+    baseName = baseName.substring(0, lastDotIndex)
   }
   
-  // 添加扩展名
-  const finalName = extension ? `${newName}.${extension}` : newName
-
+  const newName = `${baseName} 副本${extension}`
+  
+  // 创建新文件
   const newId = `file-${Date.now()}`
   const newFile: DocumentFile = {
     id: newId,
-    name: finalName,
+    name: newName,
     content: file.content,
   }
-
+  
   files.value = [...files.value, newFile]
-
+  fileContextMap[newId] = false // 初始化新文件的上下文状态
+  
   // 只有在非阻塞状态下才更新活动文件ID
   if (!props.blocking) {
     activeFileId.value = newId
+  } else {
+    emit('fileSelectBlocked', newId)
   }
 }
 </script>

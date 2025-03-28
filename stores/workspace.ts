@@ -22,6 +22,7 @@ export const DEFAULT_WORKSPACE = {
   activeFileContent: '',
   isStreaming: false,
   outputMode: 'markdown' as OutputMode,
+  contextFileIds: [] as string[], // 添加上下文文件ID数组
 }
 
 /**
@@ -38,10 +39,16 @@ export const useWorkspaceStore = defineStore(
     const activeFileContent = ref(DEFAULT_WORKSPACE.activeFileContent)
     const isStreaming = ref(DEFAULT_WORKSPACE.isStreaming)
     const outputMode = ref<OutputMode>(DEFAULT_WORKSPACE.outputMode)
+    const contextFileIds = ref<string[]>([...DEFAULT_WORKSPACE.contextFileIds]) // 添加上下文文件ID数组
 
     // 计算属性：当前活动文件
     const activeFile = computed(
       () => files.value.find(file => file.id === activeFileId.value) || null,
+    )
+
+    // 计算属性：上下文文件列表
+    const contextFiles = computed(() => 
+      files.value.filter(file => contextFileIds.value.includes(file.id))
     )
 
     // 计算属性：根据当前活动文件自动计算输出模式
@@ -131,6 +138,7 @@ export const useWorkspaceStore = defineStore(
       activeFileContent.value = DEFAULT_WORKSPACE.activeFileContent
       isStreaming.value = DEFAULT_WORKSPACE.isStreaming
       outputMode.value = DEFAULT_WORKSPACE.outputMode
+      contextFileIds.value = [...DEFAULT_WORKSPACE.contextFileIds] // 重置上下文文件ID数组
     }
 
     /**
@@ -145,6 +153,15 @@ export const useWorkspaceStore = defineStore(
 
       if (requirements.value) {
         prompt += `要求: ${requirements.value}\n\n`
+      }
+
+      // 添加上下文文件内容
+      if (contextFiles.value.length > 0) {
+        prompt += `上下文文件:\n\n`
+        
+        contextFiles.value.forEach(file => {
+          prompt += `--- ${file.name} ---\n${file.content}\n\n`
+        })
       }
 
       prompt += `请以${getOutputModeDescription(outputMode.value)}格式输出结果，直接输出文件内容，除此以外不包含其他任何信息。`
@@ -170,6 +187,27 @@ export const useWorkspaceStore = defineStore(
       }
     }
 
+    /**
+     * 添加或移除上下文文件
+     * @param fileId 文件ID
+     * @param checked 是否选中
+     */
+    function toggleContextFile(fileId: string, checked: boolean) {
+      if (checked && !contextFileIds.value.includes(fileId)) {
+        contextFileIds.value.push(fileId)
+      } else if (!checked && contextFileIds.value.includes(fileId)) {
+        contextFileIds.value = contextFileIds.value.filter(id => id !== fileId)
+      }
+    }
+
+    /**
+     * 检查文件是否在上下文列表中
+     * @param fileId 文件ID
+     */
+    function isFileInContext(fileId: string): boolean {
+      return contextFileIds.value.includes(fileId)
+    }
+
     return {
       taskDescription,
       requirements,
@@ -180,9 +218,13 @@ export const useWorkspaceStore = defineStore(
       activeFile,
       outputMode,
       currentOutputMode,
+      contextFileIds,
+      contextFiles,
       createFile,
       resetWorkspace,
       getPrompt,
+      toggleContextFile,
+      isFileInContext,
     }
   },
   {

@@ -11,8 +11,17 @@
         'btn-active': isActive,
       }"
     >
-      <Icon name="mdi:file-outline" size="16" />
-      {{ fileName }}
+      <div class="flex items-center gap-2">
+        <input 
+          type="checkbox" 
+          class="checkbox checkbox-xs checkbox-primary" 
+          :checked="checked"
+          @change="updateChecked($event)"
+          @click.stop
+        />
+        <Icon name="mdi:file-outline" size="16" />
+        {{ fileName }}
+      </div>
       <details class="dropdown ml-auto" ref="detailsRef" :open="isOpen">
         <summary
           class="btn btn-ghost btn-square btn-xs !bg-transparent !border-transparent"
@@ -54,6 +63,15 @@ defineProps({
     default: false,
   },
 })
+
+// 使用 defineModel 实现双向绑定
+const checked = defineModel<boolean>('checked', { default: false })
+
+// 更新选中状态
+const updateChecked = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  checked.value = target.checked
+}
 
 const emit = defineEmits(['click', 'rename', 'duplicate', 'delete'])
 
