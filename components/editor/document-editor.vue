@@ -7,7 +7,7 @@
           <Icon name="mdi:folder-outline" size="20" class="text-primary" />
           文档列表
         </h2>
-        <button class="btn btn-ghost btn-sm btn-circle" @click="editorModel.addNewFile">
+        <button class="btn btn-ghost btn-sm btn-circle" @click="showNewFileDialog">
           <Icon name="mdi:plus" size="16" />
         </button>
       </div>
@@ -74,10 +74,13 @@
       </div>
     </div>
   </div>
+  
+  <!-- 新建文件对话框 -->
+  <EditorNewFileDialog ref="newFileDialog" @create="createNewFile" />
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed, watch, ref } from 'vue'
 import { useEditorModel, type DocumentFile } from '~/composables/use-editor-model'
 
 // 定义事件
@@ -87,6 +90,27 @@ const emit = defineEmits(['process'])
 const files = defineModel<DocumentFile[]>('files', { default: () => [] })
 const activeFileId = defineModel<string | null>('activeFileId', { default: null })
 const activeFileContent = defineModel<string>('activeFileContent', { default: '' })
+
+// 新建文件对话框引用
+const newFileDialog = ref<{ open: () => void } | null>(null)
+
+// 显示新建文件对话框
+const showNewFileDialog = () => {
+  newFileDialog.value?.open()
+}
+
+// 创建新文件
+const createNewFile = (fileName: string) => {
+  const newId = `file-${Date.now()}`
+  const newFile: DocumentFile = {
+    id: newId,
+    name: fileName.endsWith('.txt') ? fileName : `${fileName}.txt`,
+    content: ''
+  }
+  
+  files.value = [...files.value, newFile]
+  activeFileId.value = newId
+}
 
 // 使用编辑器模型
 const editorModel = useEditorModel({
