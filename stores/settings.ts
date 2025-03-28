@@ -55,6 +55,7 @@ export const useSettingsStore = defineStore(
     // 配置持久化
     persist: {
       key: 'data-loom-settings',
+      storage: typeof window !== 'undefined' ? localStorage : undefined,
     },
   },
 )

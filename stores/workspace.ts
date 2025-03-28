@@ -115,6 +115,7 @@ export const useWorkspaceStore = defineStore(
   {
     persist: {
       key: 'data-loom-workspace',
+      storage: typeof window !== 'undefined' ? localStorage : undefined,
     },
   },
 )
