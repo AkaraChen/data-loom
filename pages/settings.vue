@@ -33,7 +33,7 @@
             />
             <button 
               class="btn btn-square btn-outline btn-sm ml-1"
-              @click="toggleApiKeyVisibility"
+              @click="toggleApiKeyVisibility()"
             >
               <Icon :name="showApiKey ? 'mdi:eye-off' : 'mdi:eye'" size="16" />
             </button>
@@ -76,7 +76,7 @@ import { useToggle } from '@vueuse/core';
 const settingsStore = useSettingsStore();
 
 // 切换 API Key 可见性
-const [showApiKey,toggleApiKeyVisibility] = useToggle(false)
+const [showApiKey, toggleApiKeyVisibility] = useToggle(false);
 
 definePageMeta({
   layout: 'default'
