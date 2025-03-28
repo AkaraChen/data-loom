@@ -34,12 +34,33 @@
           title="模型"
           description="选择要使用的模型（留空则使用默认模型）"
         >
-          <input
-            type="text"
-            v-model="settingsStore.model"
-            placeholder="例如：gpt-4-turbo"
-            class="input input-bordered input-sm w-full"
-          />
+          <div class="w-full">
+            <select
+              v-model="settingsStore.model"
+              class="select select-bordered select-sm w-full"
+              :disabled="!settingsStore.apiKey"
+            >
+              <option value="">默认模型 (gpt-3.5-turbo)</option>
+              <template v-if="isLoadingModels">
+                <option disabled>加载中...</option>
+              </template>
+              <template v-else-if="isModelsError">
+                <option disabled>加载失败，请检查 API Key</option>
+              </template>
+              <template v-else-if="models && models.length">
+                <option 
+                  v-for="model in models" 
+                  :key="model.id" 
+                  :value="model.id"
+                >
+                  {{ model.id }}
+                </option>
+              </template>
+            </select>
+            <p class="text-xs text-base-content/70 mt-1" v-if="!settingsStore.apiKey">
+              请先设置 API Key 以加载可用模型
+            </p>
+          </div>
         </SettingsItem>
 
         <SettingsItem
@@ -94,8 +115,12 @@
 
 <script setup>
 import { useToggle } from '@vueuse/core'
+import { useModels } from '~/composables/use-models'
 
 const settingsStore = useSettingsStore()
+
+// 获取可用的模型列表
+const { models, isLoading: isLoadingModels, isError: isModelsError } = useModels()
 
 // 切换 API Key 可见性
 const [showApiKey, toggleApiKeyVisibility] = useToggle(false)

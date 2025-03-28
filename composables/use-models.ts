@@ -19,7 +19,11 @@ export function useModels() {
       )
     }
 
-    const clientOptions: OpenAI.ClientOptions = {
+    const clientOptions: {
+      apiKey: string;
+      dangerouslyAllowBrowser: boolean;
+      baseURL?: string;
+    } = {
       apiKey,
       dangerouslyAllowBrowser: true,
     }
