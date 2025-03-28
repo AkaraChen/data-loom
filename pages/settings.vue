@@ -12,15 +12,22 @@
           title="模型供应商"
           description="选择你想要使用的 AI 模型供应商"
         >
-          <select
-            v-model="settingsStore.provider"
-            class="select select-bordered select-sm w-full"
-          >
-            <option disabled value="">请选择供应商</option>
-            <option value="openai">OpenAI</option>
-            <option value="google">Google</option>
-            <option value="claude">Claude</option>
-          </select>
+          <div class="relative group">
+            <select
+              v-model="settingsStore.provider"
+              class="select select-bordered select-sm w-full cursor-not-allowed opacity-80"
+              disabled
+              title="暂不支持切换模型供应商"
+            >
+              <option disabled value="">请选择供应商</option>
+              <option value="openai">OpenAI</option>
+              <option value="google">Google</option>
+              <option value="claude">Claude</option>
+            </select>
+            <div class="tooltip tooltip-top absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bg-base-300 text-base-content px-2 py-1 rounded text-xs whitespace-nowrap">
+              暂不支持切换模型供应商
+            </div>
+          </div>
         </SettingsItem>
 
         <SettingsItem
