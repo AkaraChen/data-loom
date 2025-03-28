@@ -1,54 +1,63 @@
 <template>
   <div class="flex-1 flex">
     <!-- File Explorer (Left Side) -->
-    <div class="w-64 bg-base-100 border-r border-base-300 p-4">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="font-medium flex items-center gap-2">
-          <Icon name="mdi:folder-outline" size="20" class="text-primary" />
-          文档列表
-        </h2>
-        <button
-          class="btn btn-ghost btn-sm btn-circle"
-          @click="showNewFileDialog"
-        >
-          <Icon name="mdi:plus" size="16" />
-        </button>
+    <div class="w-64 bg-base-100 border-r border-base-300 p-4 flex flex-col h-full">
+      <!-- Document List Section - Max 2/3 height -->
+      <div class="flex flex-col h-full max-h-[66%] min-h-[200px]">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="font-medium flex items-center gap-2">
+            <Icon name="mdi:folder-outline" size="20" class="text-primary" />
+            文档列表
+          </h2>
+          <button
+            class="btn btn-ghost btn-sm btn-circle"
+            @click="showNewFileDialog"
+          >
+            <Icon name="mdi:plus" size="16" />
+          </button>
+        </div>
+
+        <!-- Document List -->
+        <div class="overflow-y-auto flex-1">
+          <ul class="menu menu-compact w-full p-0">
+            <EditorFileItem
+              v-for="file in files"
+              :key="file.id"
+              :fileName="file.name"
+              :isActive="activeFileId === file.id"
+              :disabled="blocking"
+              v-model:checked="fileContextMap[file.id]"
+              @click="handleFileSelect(file.id)"
+              @delete="handleDeleteFile(file.id)"
+              @rename="handleRenameFile(file.id)"
+              @duplicate="handleDuplicateFile(file.id)"
+            />
+          </ul>
+        </div>
       </div>
 
-      <!-- Document List -->
-      <ul class="menu menu-compact w-full p-0">
-        <EditorFileItem
-          v-for="file in files"
-          :key="file.id"
-          :fileName="file.name"
-          :isActive="activeFileId === file.id"
-          :disabled="blocking"
-          v-model:checked="fileContextMap[file.id]"
-          @click="handleFileSelect(file.id)"
-          @delete="handleDeleteFile(file.id)"
-          @rename="handleRenameFile(file.id)"
-          @duplicate="handleDuplicateFile(file.id)"
-        />
-      </ul>
-
-      <!-- Context Files Section (if any files are selected) -->
-      <div v-if="contextFiles.length > 0" class="mt-4">
-        <h3 class="font-medium flex items-center gap-2 mb-2">
-          <Icon name="mdi:link-variant" size="16" class="text-primary" />
-          上下文文件
-        </h3>
-        <div class="text-xs text-base-content/70 mb-2">
-          已选择 {{ contextFiles.length }} 个文件作为上下文
+      <!-- Context Files Section - Max 1/3 height -->
+      <div v-if="contextFiles.length > 0" class="mt-4 flex-1 max-h-[33%] flex flex-col">
+        <div class="mb-2">
+          <h3 class="font-medium flex items-center gap-2">
+            <Icon name="mdi:link-variant" size="16" class="text-primary" />
+            上下文文件
+          </h3>
+          <div class="text-xs text-base-content/70">
+            已选择 {{ contextFiles.length }} 个文件作为上下文
+          </div>
         </div>
-        <ul class="menu menu-compact w-full p-0 bg-base-200 rounded-box">
-          <li
-            v-for="file in contextFiles"
-            :key="file.id"
-            class="text-xs py-1 px-2"
-          >
-            {{ file.name }}
-          </li>
-        </ul>
+        <div class="overflow-y-auto flex-1">
+          <ul class="menu menu-compact w-full p-0 bg-base-200 rounded-box">
+            <li
+              v-for="file in contextFiles"
+              :key="file.id"
+              class="text-xs py-1 px-2"
+            >
+              {{ file.name }}
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
 
