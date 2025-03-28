@@ -90,6 +90,7 @@
           v-if="isPreviewMode && activeFile"
           v-model="activeFileContent"
           :fileType="getFileExtension(activeFile?.name || '')"
+          :isStreaming="blocking"
         />
         <MonacoEditor
           v-else-if="activeFile"

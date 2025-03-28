@@ -13,7 +13,18 @@
 
     <!-- JSON Preview -->
     <div v-else-if="fileType === 'json'" class="json-preview">
-      <pre>{{ formattedJson }}</pre>
+      <pre v-if="jsonParseSuccess">{{ formattedJson }}</pre>
+      <div v-else class="flex items-center justify-center h-full">
+        <div v-if="isStreaming" class="text-base-content/70 flex flex-col items-center">
+          <div class="loading loading-spinner loading-md mb-2"></div>
+          <p>JSON 数据生成中...</p>
+        </div>
+        <div v-else class="text-error flex flex-col items-center">
+          <Icon name="mdi:alert-circle-outline" size="24" class="mb-2" />
+          <p>JSON 格式错误，请重新生成</p>
+          <p class="text-xs mt-1">{{ jsonErrorMessage }}</p>
+        </div>
+      </div>
     </div>
 
     <!-- CSV Preview -->
@@ -43,6 +54,10 @@ defineProps({
     type: String,
     default: 'txt',
   },
+  isStreaming: {
+    type: Boolean,
+    default: false
+  }
 })
 
 // 渲染 Markdown 内容
@@ -56,7 +71,27 @@ const formattedJson = computed(() => {
     const parsed = JSON.parse(modelValue.value || '{}')
     return JSON.stringify(parsed, null, 2)
   } catch (error: any) {
-    return `Invalid JSON: ${error.message}`
+    return ''
+  }
+})
+
+// JSON 解析状态
+const jsonParseSuccess = computed(() => {
+  try {
+    JSON.parse(modelValue.value || '{}')
+    return true
+  } catch {
+    return false
+  }
+})
+
+// JSON 错误信息
+const jsonErrorMessage = computed(() => {
+  try {
+    JSON.parse(modelValue.value || '{}')
+    return ''
+  } catch (error: any) {
+    return error.message
   }
 })
 
