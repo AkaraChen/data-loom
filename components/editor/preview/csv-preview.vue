@@ -17,14 +17,14 @@ const props = defineProps({
 const csvData = computed(() => {
   try {
     if (!props.content) return ''
-    
+
     // 解析 CSV 数据
     const lines = props.content.trim().split('\n')
     if (lines.length < 1) return ''
-    
+
     const headers = lines[0].split(',')
     const rows = lines.slice(1)
-    
+
     // 使用 csvToMarkdown 转换为 Markdown 表格
     return csvToMarkdown(props.content, ',', true)
   } catch (error) {

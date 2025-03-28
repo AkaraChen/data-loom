@@ -84,7 +84,7 @@
 
       <!-- Editor Content -->
       <div class="flex-1 overflow-auto bg-base-100 p-0.5 text-sm">
-        <EditorContentPreview
+        <EditorPreview
           v-if="isPreviewMode && activeFile"
           v-model="activeFileContent"
           :fileType="getFileExtension(activeFile?.name || '')"
@@ -164,7 +164,7 @@
 
 <script setup lang="ts">
 import { computed, watch, ref, reactive } from 'vue'
-import EditorContentPreview from './content-preview.vue'
+import EditorPreview from './preview/index.vue'
 
 // 文档文件接口
 interface DocumentFile {

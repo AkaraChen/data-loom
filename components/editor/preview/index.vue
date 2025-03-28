@@ -7,10 +7,10 @@
     <PlaintextPreview v-else-if="fileType === 'txt'" :content="modelValue" />
 
     <!-- JSON Preview -->
-    <JsonPreview 
-      v-else-if="fileType === 'json'" 
-      :content="modelValue" 
-      :isStreaming="isStreaming" 
+    <JsonPreview
+      v-else-if="fileType === 'json'"
+      :content="modelValue"
+      :isStreaming="isStreaming"
     />
 
     <!-- CSV Preview -->
