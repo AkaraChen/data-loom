@@ -38,24 +38,21 @@
 
         <!-- Updated menu with full width hover -->
         <ul class="menu menu-compact w-full p-0">
-          <li class="w-full">
-            <a class="active w-full flex justify-start">
-              <Icon name="mdi:file-outline" size="16" />
-              a.txt
-            </a>
-          </li>
-          <li class="w-full">
-            <a class="w-full flex justify-start">
-              <Icon name="mdi:file-outline" size="16" />
-              b.txt
-            </a>
-          </li>
-          <li class="w-full">
-            <a class="w-full flex justify-start">
-              <Icon name="mdi:file-outline" size="16" />
-              c.txt
-            </a>
-          </li>
+          <FileItem 
+            fileName="a.txt"
+            :isActive="activeFile === 'a.txt'"
+            @click="activeFile = 'a.txt'"
+          />
+          <FileItem 
+            fileName="b.txt"
+            :isActive="activeFile === 'b.txt'"
+            @click="activeFile = 'b.txt'"
+          />
+          <FileItem 
+            fileName="c.txt"
+            :isActive="activeFile === 'c.txt'"
+            @click="activeFile = 'c.txt'"
+          />
         </ul>
       </div>
 
@@ -68,7 +65,7 @@
               class="px-3 py-2 flex items-center gap-2 bg-base-100 border-r border-base-content/10"
             >
               <Icon name="mdi:file-outline" size="16" class="text-primary" />
-              <span>a.txt</span>
+              <span>{{ activeFile }}</span>
               <button class="btn btn-ghost btn-xs btn-circle">
                 <Icon name="mdi:close" size="12" />
               </button>
@@ -106,6 +103,7 @@ definePageMeta({
 
 const taskDescription = ref('')
 const requirements = ref('')
+const activeFile = ref('a.txt')
 </script>
 
 <style>
