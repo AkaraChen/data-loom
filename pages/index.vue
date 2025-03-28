@@ -6,7 +6,7 @@
       <UiTextSection
         icon="mdi:clipboard-text-outline"
         title="任务描述"
-        placeholder="Enter task description..."
+        placeholder="在此输入任务描述..."
         v-model="workspaceStore.taskDescription"
       />
 
@@ -14,7 +14,7 @@
       <UiTextSection
         icon="mdi:chevron-right"
         title="要求"
-        placeholder="Enter requirements..."
+        placeholder="在此输入要求..."
         v-model="workspaceStore.requirements"
       />
 
