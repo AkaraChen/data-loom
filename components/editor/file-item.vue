@@ -33,7 +33,7 @@
           <Icon name="mdi:more-vert" size="16" />
         </summary>
         <ul
-          class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+          class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm !fixed"
           @click.stop="isOpen = false"
         >
           <li @click="$emit('rename')">
