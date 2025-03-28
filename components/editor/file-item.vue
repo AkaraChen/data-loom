@@ -3,15 +3,17 @@
     class="w-full"
     ref="liRef"
     @click="disabled ? null : $emit('click')"
-    :class="{ 'cursor-not-allowed opacity-70': disabled }"
+    :class="{
+      'cursor-not-allowed opacity-70': disabled,
+      'pointer-events-none': disabled,
+    }"
   >
     <a class="w-full flex justify-start active:!bg-transparent">
       <div class="flex items-center gap-2">
         <input
           type="checkbox"
           class="checkbox checkbox-xs checkbox-primary"
-          :checked="checked"
-          @change="updateChecked($event)"
+          v-model="checked"
           @click.stop
         />
         <Icon name="mdi:file-outline" size="16" />
@@ -72,12 +74,6 @@ defineProps({
 
 // 使用 defineModel 实现双向绑定
 const checked = defineModel<boolean>('checked', { default: false })
-
-// 更新选中状态
-const updateChecked = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  checked.value = target.checked
-}
 
 const emit = defineEmits(['click', 'rename', 'duplicate', 'delete'])
 
