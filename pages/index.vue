@@ -39,7 +39,6 @@
       v-model:files="workspaceStore.files"
       v-model:activeFileId="workspaceStore.activeFileId"
       v-model:activeFileContent="workspaceStore.activeFileContent"
-      @process="processDocument"
       :blocking="workspaceStore.isStreaming"
       @fileSelectBlocked="handleFileSelectBlocked"
     />
@@ -49,7 +48,6 @@
 <script setup lang="ts">
 import { useChat } from '~/composables/use-chat'
 import { useWorkspaceStore } from '~/stores/workspace'
-import type { DocumentFile } from '~/composables/use-editor-model'
 
 definePageMeta({
   layout: 'default',
@@ -98,11 +96,6 @@ const generateContent = async () => {
     systemPrompt:
       '你是一个专业的内容生成助手，擅长根据用户的要求生成高质量的文档内容。',
   })
-}
-
-// 处理文档
-const processDocument = (file: DocumentFile) => {
-  console.log('处理文档:', file)
 }
 
 // 处理文件选择被阻塞的情况
