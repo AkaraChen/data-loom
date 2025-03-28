@@ -3,32 +3,20 @@
     <!-- Sidebar -->
     <div class="w-64 bg-base-100 p-4 shadow-lg border-r border-base-300">
       <!-- Task Section -->
-      <div class="mb-6">
-        <div class="flex items-center gap-2 mb-2">
-          <Icon
-            name="mdi:clipboard-text-outline"
-            size="20"
-            class="text-primary"
-          />
-          <h2 class="text-lg font-medium">任务描述</h2>
-        </div>
-        <textarea
-          class="textarea textarea-bordered w-full"
-          placeholder="Enter task description..."
-        ></textarea>
-      </div>
+      <TextSection
+        icon="mdi:clipboard-text-outline"
+        title="任务描述"
+        placeholder="Enter task description..."
+        v-model="taskDescription"
+      />
 
       <!-- Requirements Section -->
-      <div class="mb-6">
-        <div class="flex items-center gap-2 mb-2">
-          <Icon name="mdi:chevron-right" size="20" class="text-primary" />
-          <h2 class="text-lg font-medium">要求</h2>
-        </div>
-        <textarea
-          class="textarea textarea-bordered w-full"
-          placeholder="Enter requirements..."
-        ></textarea>
-      </div>
+      <TextSection
+        icon="mdi:chevron-right"
+        title="要求"
+        placeholder="Enter requirements..."
+        v-model="requirements"
+      />
 
       <!-- Action Button -->
       <button class="btn btn-primary w-full gap-2">
@@ -71,7 +59,7 @@
         </ul>
       </div>
 
-      <!-- File Content (Right Side - VSCode Style) -->
+      <!-- File Content -->
       <div class="flex-1 flex flex-col">
         <!-- Editor Tabs -->
         <div class="flex bg-base-100 border-b border-base-content/10">
@@ -111,9 +99,13 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 definePageMeta({
   layout: 'default',
 })
+
+const taskDescription = ref('')
+const requirements = ref('')
 </script>
 
 <style>
