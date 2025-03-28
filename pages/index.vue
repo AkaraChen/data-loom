@@ -7,7 +7,7 @@
         icon="mdi:clipboard-text-outline"
         title="任务描述"
         placeholder="Enter task description..."
-        v-model="taskDescription"
+        v-model="workspaceStore.taskDescription"
       />
 
       <!-- Requirements Section -->
@@ -15,95 +15,82 @@
         icon="mdi:chevron-right"
         title="要求"
         placeholder="Enter requirements..."
-        v-model="requirements"
+        v-model="workspaceStore.requirements"
       />
 
       <!-- Action Button -->
       <button
         class="btn btn-primary w-full gap-2"
         @click="generateContent"
-        :disabled="isStreaming"
+        :disabled="workspaceStore.isStreaming"
       >
-        <Icon v-if="!isStreaming" name="mdi:play-circle-outline" size="20" />
+        <Icon
+          v-if="!workspaceStore.isStreaming"
+          name="mdi:play-circle-outline"
+          size="20"
+        />
         <span v-else class="loading loading-spinner loading-sm"></span>
-        {{ isStreaming ? '生成中...' : '生成' }}
+        {{ workspaceStore.isStreaming ? '生成中...' : '生成' }}
       </button>
     </div>
 
     <!-- Main Content - Document Editor -->
     <EditorDocumentEditor
-      v-model:files="files"
-      v-model:activeFileId="activeFileId"
-      v-model:activeFileContent="activeFileContent"
+      v-model:files="workspaceStore.files"
+      v-model:activeFileId="workspaceStore.activeFileId"
+      v-model:activeFileContent="workspaceStore.activeFileContent"
       @process="processDocument"
-      :blocking="isStreaming"
+      :blocking="workspaceStore.isStreaming"
+      @fileSelectBlocked="handleFileSelectBlocked"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useChat } from '~/composables/use-chat'
+import { useWorkspaceStore } from '~/stores/workspace'
 import type { DocumentFile } from '~/composables/use-editor-model'
 
 definePageMeta({
   layout: 'default',
 })
 
-const taskDescription = ref('')
-const requirements = ref('')
-
-// 初始化文件列表
-const files = ref<DocumentFile[]>([])
-
-// 当前活动文件ID
-const activeFileId = ref<string | null>(null)
-
-// 活动文件内容
-const activeFileContent = ref<string>(
-  '这是一个示例文档，你可以在这里编辑内容。',
-)
+// 初始化工作区存储
+const workspaceStore = useWorkspaceStore()
 
 // 初始化聊天功能
 const {
   sendMessage,
   isStreaming,
-  streamedText,
   abortChat,
   reset: resetChat,
 } = useChat({
   onUpdate: text => {
     // 实时更新活动文件内容
-    if (activeFileId.value) {
-      activeFileContent.value = text
+    if (workspaceStore.activeFileId) {
+      workspaceStore.activeFileContent = text
     }
   },
 })
 
+// 监听流式传输状态变化
+watch(isStreaming, newValue => {
+  workspaceStore.isStreaming = newValue
+})
+
 // 生成内容
 const generateContent = async () => {
-  if (!activeFileId.value) {
+  if (!workspaceStore.activeFileId) {
     // 如果没有活动文件，创建一个新文件
-    const newFile: DocumentFile = {
-      id: `file-${Date.now()}`,
-      name: '生成的文档.md',
-      content: '',
-    }
-
-    files.value.push(newFile)
-    activeFileId.value = newFile.id
+    const newId = workspaceStore.createFile('生成的文档.md')
+    workspaceStore.activeFileId = newId
   }
 
   // 重置聊天内容
   resetChat()
 
-  // 构建提示词
-  const prompt = `
-任务描述: ${taskDescription.value}
-要求: ${requirements.value}
-
-请根据以上信息生成内容。
-`
+  // 获取提示词
+  const prompt = workspaceStore.getPrompt()
 
   // 发送消息到 OpenAI
   sendMessage({
@@ -116,6 +103,10 @@ const generateContent = async () => {
 // 处理文档
 const processDocument = (file: DocumentFile) => {
   console.log('处理文档:', file)
-  // 这里可以添加文档处理逻辑
+}
+
+// 处理文件选择被阻塞的情况
+const handleFileSelectBlocked = (fileId: string) => {
+  console.log('文件选择被阻塞:', fileId)
 }
 </script>
