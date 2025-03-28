@@ -11,66 +11,29 @@
         <p class="text-base-content/80 mb-2">
           当前文件: <span class="font-medium">{{ fileName }}</span>
         </p>
-        <p class="text-xs text-base-content/70">
-          请选择要对此文件执行的操作
-        </p>
       </div>
-
-      <div class="grid grid-cols-1 gap-3 mb-4">
-        <button 
-          class="btn btn-outline flex justify-start gap-2 normal-case" 
-          @click="selectAction('summarize')"
-        >
-          <Icon name="mdi:text-box-outline" size="18" />
-          <div class="flex flex-col items-start">
-            <span>总结内容</span>
-            <span class="text-xs text-base-content/70">生成文档内容的摘要</span>
-          </div>
-        </button>
-        
-        <button 
-          class="btn btn-outline flex justify-start gap-2 normal-case" 
-          @click="selectAction('analyze')"
-        >
-          <Icon name="mdi:chart-box-outline" size="18" />
-          <div class="flex flex-col items-start">
-            <span>分析数据</span>
-            <span class="text-xs text-base-content/70">分析文档中的数据并生成报告</span>
-          </div>
-        </button>
-        
-        <button 
-          class="btn btn-outline flex justify-start gap-2 normal-case" 
-          @click="selectAction('transform')"
-        >
-          <Icon name="mdi:file-replace-outline" size="18" />
-          <div class="flex flex-col items-start">
-            <span>转换格式</span>
-            <span class="text-xs text-base-content/70">将文档转换为其他格式</span>
-          </div>
-        </button>
-        
-        <button 
-          class="btn btn-outline flex justify-start gap-2 normal-case" 
-          @click="selectAction('custom')"
-        >
-          <Icon name="mdi:cog-outline" size="18" />
-          <div class="flex flex-col items-start">
-            <span>自定义处理</span>
-            <span class="text-xs text-base-content/70">使用自定义提示进行处理</span>
-          </div>
-        </button>
+      
+      <!-- Custom Processing Form -->
+      <div class="form-control mb-4 flex flex-col">
+        <textarea 
+          class="textarea textarea-bordered h-24 w-full" 
+          placeholder="请输入处理要求..." 
+          v-model="customPrompt"
+        ></textarea>
       </div>
 
       <div class="modal-action">
         <form method="dialog">
-          <button class="btn">取消</button>
+          <button 
+            class="btn btn-primary" 
+            @click="submitCustomProcess"
+            :disabled="!customPrompt.trim()"
+          >
+            提交
+          </button>
         </form>
       </div>
     </div>
-    <form method="dialog" class="modal-backdrop">
-      <button>关闭</button>
-    </form>
   </dialog>
 </template>
 
@@ -83,8 +46,9 @@ type ProcessAction = 'summarize' | 'analyze' | 'transform' | 'custom'
 // 定义事件
 const emit = defineEmits(['process'])
 
-// 文件名
+// 文件名和自定义提示
 const fileName = ref('')
+const customPrompt = ref('')
 const dialogRef = ref<HTMLDialogElement | null>(null)
 
 // 选择处理动作
@@ -93,9 +57,18 @@ const selectAction = (action: ProcessAction) => {
   dialogRef.value?.close()
 }
 
+// 提交自定义处理
+const submitCustomProcess = () => {
+  if (customPrompt.value.trim()) {
+    emit('process', { action: 'custom', prompt: customPrompt.value.trim() })
+    dialogRef.value?.close()
+  }
+}
+
 // 打开对话框的方法 - 可以从父组件调用
 const open = (currentFileName: string) => {
   fileName.value = currentFileName
+  customPrompt.value = ''
   dialogRef.value?.showModal()
 }
 
