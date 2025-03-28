@@ -16,11 +16,12 @@
         </summary>
         <ul
           class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+          @click.stop="isOpen = false"
         >
-          <li><a @click.stop="$emit('rename')">Rename</a></li>
-          <li><a @click.stop="$emit('duplicate')">Duplicate</a></li>
+          <li><a @click="$emit('rename')">Rename</a></li>
+          <li><a @click="$emit('duplicate')">Duplicate</a></li>
           <li>
-            <a @click.stop="$emit('delete')" class="text-error">Delete</a>
+            <a @click="$emit('delete')" class="text-error">Delete</a>
           </li>
         </ul>
       </details>
