@@ -14,4 +14,8 @@ export interface Toast {
    * 显示持续时间（毫秒）
    */
   duration?: number
+  /**
+   * 唯一标识符（内部使用）
+   */
+  id?: number
 }

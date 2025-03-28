@@ -4,21 +4,35 @@ import type { Toast } from '~/types/toast'
 // 创建一个全局的 toast 状态
 const toasts = ref<Toast[]>([])
 
+// 为每个 toast 创建一个唯一 ID
+let nextId = 0
+
 export function useToast() {
   // 显示 toast
   const showToast = (toast: Toast) => {
-    // 添加 toast 到列表
-    toasts.value.push(toast)
+    // 添加唯一 ID
+    const id = nextId++
+    const toastWithId = { ...toast, id }
     
-    // 设置自动移除
-    const duration = toast.duration || 3000
-    setTimeout(() => {
-      // 找到要移除的 toast 的索引
-      const index = toasts.value.findIndex(t => t === toast)
-      if (index !== -1) {
-        toasts.value.splice(index, 1)
-      }
-    }, duration)
+    // 添加 toast 到列表
+    toasts.value.push(toastWithId)
+    
+    // 确保只在客户端执行
+    if (import.meta.client) {
+      // 设置自动移除
+      const duration = toast.duration || 3000
+      setTimeout(() => {
+        removeToast(id)
+      }, duration)
+    }
+  }
+  
+  // 移除指定 ID 的 toast
+  const removeToast = (id: number) => {
+    const index = toasts.value.findIndex(t => t.id === id)
+    if (index !== -1) {
+      toasts.value.splice(index, 1)
+    }
   }
 
   // 快捷方法
@@ -41,6 +55,7 @@ export function useToast() {
   return {
     toasts,
     showToast,
+    removeToast,
     info,
     success,
     warning,
