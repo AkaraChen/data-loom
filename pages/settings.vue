@@ -24,7 +24,9 @@
               <option value="google">Google</option>
               <option value="claude">Claude</option>
             </select>
-            <div class="tooltip tooltip-top absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bg-base-300 text-base-content px-2 py-1 rounded text-xs whitespace-nowrap">
+            <div
+              class="tooltip tooltip-top absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bg-base-300 text-base-content px-2 py-1 rounded text-xs whitespace-nowrap"
+            >
               暂不支持切换模型供应商
             </div>
           </div>
@@ -48,16 +50,19 @@
                 <option disabled>加载失败，请检查 API Key</option>
               </template>
               <template v-else-if="models && models.length">
-                <option 
-                  v-for="model in models" 
-                  :key="model.id" 
+                <option
+                  v-for="model in models"
+                  :key="model.id"
                   :value="model.id"
                 >
                   {{ model.id }}
                 </option>
               </template>
             </select>
-            <p class="text-xs text-base-content/70 mt-1" v-if="!settingsStore.apiKey">
+            <p
+              class="text-xs text-base-content/70 mt-1"
+              v-if="!settingsStore.apiKey"
+            >
               请先设置 API Key 以加载可用模型
             </p>
           </div>
@@ -120,7 +125,11 @@ import { useModels } from '~/composables/use-models'
 const settingsStore = useSettingsStore()
 
 // 获取可用的模型列表
-const { models, isLoading: isLoadingModels, isError: isModelsError } = useModels()
+const {
+  models,
+  isLoading: isLoadingModels,
+  isError: isModelsError,
+} = useModels()
 
 // 切换 API Key 可见性
 const [showApiKey, toggleApiKeyVisibility] = useToggle(false)

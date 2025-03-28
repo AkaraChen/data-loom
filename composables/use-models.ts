@@ -17,12 +17,10 @@ export function useModels() {
       try {
         const openai = getClient()
         const response = await openai.models.list()
-        
+
         // Filter for chat completion models and sort by ID
         const chatModels = response.data
-          .filter(model => 
-            model.id.includes('gpt')
-          )
+          .filter(model => model.id.includes('gpt'))
           .sort((a, b) => a.id.localeCompare(b.id))
         return chatModels
       } catch (error) {

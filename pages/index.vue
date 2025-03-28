@@ -98,25 +98,25 @@ watch(
 )
 
 // 处理文件处理请求
-const handleProcessFile = (data: { file: DocumentFile, action: any }) => {
+const handleProcessFile = (data: { file: DocumentFile; action: any }) => {
   // 重置处理聊天内容
   resetProcessChat()
-  
+
   // 准备文件内容
   const fileContent = data.file.content
   const fileName = data.file.name
-  
+
   // 获取自定义提示
   const customPrompt = typeof data.action === 'string' ? '' : data.action.prompt
-  
+
   // 生成系统提示和用户提示
   const systemPrompt = `你是一个专业的内容处理助手，擅长根据用户的特定要求处理文档内容。文件名: ${fileName}`
   const userPrompt = `文件内容：\n\n${fileContent}\n\n处理要求：${customPrompt}`
-  
+
   // 发送处理请求
   processFile({
     content: userPrompt,
-    systemPrompt
+    systemPrompt,
   })
 }
 

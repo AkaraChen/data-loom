@@ -96,6 +96,14 @@
           :lang="getFileExtension(activeFile?.name || '')"
           @update:modelValue="updateFileContent"
           class="w-full h-full"
+          :options="{
+            minimap: { enabled: false },
+            unicodeHighlight: {
+              nonBasicASCII: false,
+              ambiguousCharacters: false,
+            },
+            fontFamily: 'Space Mono, Noto Sans SC, monospace',
+          }"
         />
         <!-- <textarea
           v-else-if="activeFile"
@@ -452,7 +460,8 @@ const getFileExtension = (fileName: string): string => {
   width: 100%;
 }
 
-.markdown-body {
-  padding: 0.5rem;
+/* 用于触发 nuxt font */
+.not-exist-class {
+  font-family: 'Space Mono', monospace;
 }
 </style>
