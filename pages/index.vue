@@ -47,16 +47,10 @@ const taskDescription = ref('')
 const requirements = ref('')
 
 // 初始化文件列表
-const files = ref<DocumentFile[]>([
-  {
-    id: 'file-1',
-    name: '示例文档.txt',
-    content: '这是一个示例文档，你可以在这里编辑内容。'
-  }
-])
+const files = ref<DocumentFile[]>([])
 
 // 当前活动文件ID
-const activeFileId = ref<string>('file-1')
+const activeFileId = ref<string | null>(null)
 
 // 活动文件内容
 const activeFileContent = ref<string>('这是一个示例文档，你可以在这里编辑内容。')

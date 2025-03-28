@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
     '@vueuse/nuxt',
+    '@hebilicious/vue-query-nuxt',
   ],
   css: ['@/assets/app.css'],
   vite: {

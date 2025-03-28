@@ -1,5 +1,5 @@
 <template>
-  <dialog id="new-file-dialog" class="modal modal-bottom sm:modal-middle">
+  <dialog id="new-file-dialog" class="modal modal-bottom sm:modal-middle" ref="dialogRef">
     <div class="modal-box">
       <h3 class="font-bold text-lg mb-4">新建文件</h3>
       
@@ -11,6 +11,7 @@
           class="input w-full" 
           v-model="fileName"
           @keyup.enter="createFile"
+          ref="inputRef"
         />
         <p class="fieldset-label">You can edit page title later on from settings</p>
       </fieldset>
@@ -29,10 +30,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 
 const emit = defineEmits(['create'])
 const fileName = ref('')
+const dialogRef = ref<HTMLDialogElement | null>(null)
+const inputRef = ref<HTMLInputElement | null>(null)
 
 // 创建文件方法
 const createFile = () => {
@@ -40,20 +43,16 @@ const createFile = () => {
     emit('create', fileName.value.trim())
     fileName.value = ''
     // 关闭对话框
-    const dialog = document.getElementById('new-file-dialog') as HTMLDialogElement
-    dialog?.close()
+    dialogRef.value?.close()
   }
 }
 
 // 打开对话框的方法 - 可以从父组件调用
-const open = () => {
-  const dialog = document.getElementById('new-file-dialog') as HTMLDialogElement
-  dialog?.showModal()
-  // 聚焦到输入框
-  setTimeout(() => {
-    const input = dialog?.querySelector('input')
-    input?.focus()
-  }, 100)
+const open = async () => {
+  dialogRef.value?.showModal()
+  // 使用 nextTick 确保 DOM 已更新后再聚焦
+  await nextTick()
+  inputRef.value?.focus()
 }
 
 // 暴露方法给父组件
