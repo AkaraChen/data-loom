@@ -1,7 +1,7 @@
 <template>
-  <div class="content-preview">
+  <div class="content-preview markdown-body">
     <!-- Markdown Preview -->
-    <div v-if="fileType === 'md'" v-html="renderedMarkdown" class="markdown-body"></div>
+    <div v-if="fileType === 'md'" v-html="renderedMarkdown"></div>
     
     <!-- Plain Text Preview -->
     <div v-else-if="fileType === 'txt'" class="plain-text-preview whitespace-pre-wrap">{{ modelValue }}</div>
@@ -35,12 +35,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { marked } from 'marked'
+import 'github-markdown-css/github-markdown.css'
 
 // 使用 defineModel 实现双向绑定
 const modelValue = defineModel<string>('modelValue', { default: '' })
 
 // 定义组件属性
-const props = defineProps({
+defineProps({
   fileType: {
     type: String,
     default: 'txt',
