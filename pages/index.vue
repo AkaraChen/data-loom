@@ -50,6 +50,8 @@
 <script setup lang="ts">
 import { useChat } from '~/composables/use-chat'
 import { useWorkspaceStore, type DocumentFile } from '~/stores/workspace'
+import { useSettingsStore } from '~/stores/settings'
+import { useToast } from '~/composables/use-toast'
 import { watch } from 'vue'
 
 definePageMeta({
@@ -58,6 +60,12 @@ definePageMeta({
 
 // 初始化工作区存储
 const workspaceStore = useWorkspaceStore()
+
+// 初始化设置存储
+const settingsStore = useSettingsStore()
+
+// 初始化 toast
+const toast = useToast()
 
 // 初始化聊天功能
 const {
@@ -97,8 +105,28 @@ watch(
   },
 )
 
+// 检查 API 配置是否完整
+const checkApiConfig = () => {
+  if (!settingsStore.apiKey) {
+    toast.warning('请在设置中配置 API 密钥')
+    return false
+  }
+  
+  if (!settingsStore.model) {
+    toast.warning('请在设置中配置模型')
+    return false
+  }
+  
+  return true
+}
+
 // 处理文件处理请求
 const handleProcessFile = (data: { file: DocumentFile; action: any }) => {
+  // 检查 API 配置
+  if (!checkApiConfig()) {
+    return
+  }
+
   // 重置处理聊天内容
   resetProcessChat()
 
@@ -122,6 +150,11 @@ const handleProcessFile = (data: { file: DocumentFile; action: any }) => {
 
 // 生成内容
 const generateContent = async () => {
+  // 检查 API 配置
+  if (!checkApiConfig()) {
+    return
+  }
+
   if (!workspaceStore.activeFileId) {
     // 如果没有活动文件，创建一个新文件，默认使用 markdown
     const extension = '.md'

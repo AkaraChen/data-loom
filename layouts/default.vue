@@ -15,5 +15,12 @@
       </div>
     </div>
     <slot />
+    
+    <!-- Toast 组件 -->
+    <UiToast />
   </div>
 </template>
+
+<script setup lang="ts">
+// 这里不需要导入任何内容，因为 UiToast 组件会自动导入
+</script>
