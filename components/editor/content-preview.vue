@@ -18,22 +18,7 @@
 
     <!-- CSV Preview -->
     <div v-else-if="fileType === 'csv'" class="csv-preview">
-      <table class="table table-compact w-full">
-        <thead v-if="csvData.length > 0">
-          <tr>
-            <th v-for="(header, index) in csvData[0]" :key="index">
-              {{ header }}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(row, rowIndex) in csvData.slice(1)" :key="rowIndex">
-            <td v-for="(cell, cellIndex) in row" :key="cellIndex">
-              {{ cell }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div v-html="csvData"></div>
     </div>
 
     <!-- Default Preview (Fallback to plain text) -->
@@ -47,6 +32,7 @@
 import { computed } from 'vue'
 import { marked } from 'marked'
 import 'github-markdown-css/github-markdown.css'
+import csvToMarkdown from 'csv-to-markdown-table'
 
 // 使用 defineModel 实现双向绑定
 const modelValue = defineModel<string>('modelValue', { default: '' })
@@ -76,10 +62,7 @@ const formattedJson = computed(() => {
 
 // 解析 CSV 内容
 const csvData = computed(() => {
-  if (!modelValue.value) return []
-
-  const rows = modelValue.value.split('\n')
-  return rows.map(row => row.split(',').map(cell => cell.trim()))
+  return marked(csvToMarkdown(modelValue.value || '', ',', true))
 })
 </script>
 
