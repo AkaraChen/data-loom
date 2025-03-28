@@ -72,8 +72,9 @@
 
       <!-- Editor Content -->
       <div class="flex-1 overflow-auto bg-base-100 p-0.5 font-mono text-sm">
+        <div v-if="isPreviewMode && activeFile" v-html="marked(activeFileContent)" class="markdown-body"></div>
         <textarea
-          v-if="activeFile"
+          v-else-if="activeFile"
           class="textarea !border-transparent !outline-none w-full h-full"
           placeholder="Enter content..."
           :value="activeFileContent"
@@ -89,8 +90,18 @@
 
       <!-- Editor Actions -->
       <div
-        class="flex justify-end p-2 bg-base-100 border-t border-base-content/10"
+        class="flex justify-between p-2 bg-base-100 border-t border-base-content/10"
       >
+        <div class="flex items-center">
+          <button
+            class="btn btn-sm btn-ghost gap-1"
+            @click="togglePreviewMode"
+            :class="{ 'btn-active': isPreviewMode }"
+          >
+            <Icon :name="isPreviewMode ? 'mdi:eye' : 'mdi:code-tags'" size="16" />
+            {{ isPreviewMode ? '预览' : '源码' }}
+          </button>
+        </div>
         <button
           class="btn btn-sm btn-primary gap-1"
           :disabled="!activeFile"
@@ -109,6 +120,7 @@
 
 <script setup lang="ts">
 import { computed, watch, ref, reactive } from 'vue'
+import {marked} from 'marked'
 
 // 文档文件接口
 interface DocumentFile {
@@ -354,11 +366,23 @@ const handleDuplicateFile = (fileId: string) => {
     emit('fileSelectBlocked', newId)
   }
 }
+
+// 预览模式
+const isPreviewMode = ref(false)
+
+// 切换预览模式
+const togglePreviewMode = () => {
+  isPreviewMode.value = !isPreviewMode.value
+}
 </script>
 
 <style scoped>
 /* 确保菜单项占满宽度 */
 :deep(.menu li a) {
   width: 100%;
+}
+
+.markdown-body {
+  padding: 0.5rem;
 }
 </style>
