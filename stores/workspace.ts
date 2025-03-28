@@ -44,6 +44,27 @@ export const useWorkspaceStore = defineStore(
       () => files.value.find(file => file.id === activeFileId.value) || null,
     )
 
+    // 计算属性：根据当前活动文件自动计算输出模式
+    const currentOutputMode = computed(() => {
+      if (!activeFile.value) return 'markdown'
+
+      const extension =
+        activeFile.value.name.split('.').pop()?.toLowerCase() || ''
+
+      switch (extension) {
+        case 'txt':
+          return 'plaintext'
+        case 'md':
+          return 'markdown'
+        case 'csv':
+          return 'csv'
+        case 'json':
+          return 'json'
+        default:
+          return 'markdown' // 默认使用 markdown
+      }
+    })
+
     // 监听活动文件ID变化，自动同步内容
     watch(activeFileId, newId => {
       if (newId) {
@@ -73,6 +94,15 @@ export const useWorkspaceStore = defineStore(
       }
     })
 
+    // 监听当前计算的输出模式，自动更新输出模式状态
+    watch(
+      currentOutputMode,
+      newMode => {
+        outputMode.value = newMode as OutputMode
+      },
+      { immediate: true },
+    )
+
     /**
      * 创建新文件
      * @param fileName 文件名
@@ -80,10 +110,9 @@ export const useWorkspaceStore = defineStore(
      */
     function createFile(fileName: string): string {
       const newId = `file-${Date.now()}`
-      const hasExt = fileName.split('.').length > 1
       const newFile: DocumentFile = {
         id: newId,
-        name: hasExt ? fileName : `${fileName}.txt`,
+        name: fileName,
         content: '',
       }
 
@@ -150,6 +179,7 @@ export const useWorkspaceStore = defineStore(
       isStreaming,
       activeFile,
       outputMode,
+      currentOutputMode,
       createFile,
       resetWorkspace,
       getPrompt,

@@ -18,23 +18,6 @@
         v-model="workspaceStore.requirements"
       />
 
-      <!-- Output Mode Selector -->
-      <div class="mb-4">
-        <h2 class="font-medium mb-2">输出格式</h2>
-        <div class="join w-full">
-          <button
-            v-for="mode in outputModes"
-            :key="mode.value"
-            class="btn btn-sm join-item flex-1"
-            :class="{ 'btn-primary': workspaceStore.outputMode === mode.value }"
-            @click="workspaceStore.outputMode = mode.value"
-            :disabled="workspaceStore.isStreaming"
-          >
-            {{ mode.label }}
-          </button>
-        </div>
-      </div>
-
       <!-- Action Button -->
       <button
         class="btn btn-primary w-full gap-2"
@@ -65,19 +48,11 @@
 <script setup lang="ts">
 import { useChat } from '~/composables/use-chat'
 import { useWorkspaceStore } from '~/stores/workspace'
-import type { OutputMode } from '~/stores/workspace'
+import { watch } from 'vue'
 
 definePageMeta({
   layout: 'default',
 })
-
-// 输出模式选项
-const outputModes = [
-  { value: 'plaintext', label: '文本' },
-  { value: 'markdown', label: 'MD' },
-  { value: 'csv', label: 'CSV' },
-  { value: 'json', label: 'JSON' },
-] as const
 
 // 初始化工作区存储
 const workspaceStore = useWorkspaceStore()
@@ -98,15 +73,18 @@ const {
 })
 
 // 监听流式传输状态变化
-watch(isStreaming, newValue => {
-  workspaceStore.isStreaming = newValue
-})
+watch(
+  () => isStreaming.value,
+  newValue => {
+    workspaceStore.isStreaming = newValue
+  },
+)
 
 // 生成内容
 const generateContent = async () => {
   if (!workspaceStore.activeFileId) {
-    // 如果没有活动文件，创建一个新文件
-    const extension = getFileExtensionForMode(workspaceStore.outputMode)
+    // 如果没有活动文件，创建一个新文件，默认使用 markdown
+    const extension = '.md'
     const newId = workspaceStore.createFile(`生成的文档${extension}`)
     workspaceStore.activeFileId = newId
   }
@@ -123,22 +101,6 @@ const generateContent = async () => {
     systemPrompt:
       '你是一个专业的内容生成助手，擅长根据用户的要求生成高质量的文档内容。',
   })
-}
-
-// 根据输出模式获取文件扩展名
-const getFileExtensionForMode = (mode: OutputMode): string => {
-  switch (mode) {
-    case 'plaintext':
-      return '.txt'
-    case 'markdown':
-      return '.md'
-    case 'csv':
-      return '.csv'
-    case 'json':
-      return '.json'
-    default:
-      return '.md'
-  }
 }
 
 // 处理文件选择被阻塞的情况

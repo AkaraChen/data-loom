@@ -156,7 +156,7 @@ const createNewFile = (fileName: string) => {
   const newId = `file-${Date.now()}`
   const newFile: DocumentFile = {
     id: newId,
-    name: fileName.endsWith('.txt') ? fileName : `${fileName}.txt`,
+    name: fileName,
     content: '',
   }
 
@@ -221,7 +221,7 @@ const handleRenameFile = (fileId: string) => {
       const updatedFiles = [...files.value]
       updatedFiles[fileIndex] = {
         ...updatedFiles[fileIndex],
-        name: newName.endsWith('.txt') ? newName : `${newName}.txt`,
+        name: newName,
       }
       files.value = updatedFiles
     }
