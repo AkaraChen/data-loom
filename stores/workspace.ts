@@ -64,9 +64,10 @@ export const useWorkspaceStore = defineStore(
      */
     function createFile(fileName: string): string {
       const newId = `file-${Date.now()}`
+      const hasExt = fileName.split('.').length > 1
       const newFile: DocumentFile = {
         id: newId,
-        name: fileName.endsWith('.txt') ? fileName : `${fileName}.txt`,
+        name: hasExt ? fileName : `${fileName}.txt`,
         content: '',
       }
 
