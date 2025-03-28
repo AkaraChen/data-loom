@@ -11,6 +11,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@hebilicious/vue-query-nuxt',
     'nuxt-monaco-editor',
+    '@nuxt/fonts',
   ],
   css: ['@/assets/app.css'],
   vite: {

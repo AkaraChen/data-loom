@@ -83,7 +83,7 @@
       </div>
 
       <!-- Editor Content -->
-      <div class="flex-1 overflow-auto bg-base-100 p-0.5 font-mono text-sm">
+      <div class="flex-1 overflow-auto bg-base-100 p-0.5 text-sm">
         <EditorContentPreview
           v-if="isPreviewMode && activeFile"
           v-model="activeFileContent"
