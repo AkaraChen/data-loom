@@ -24,9 +24,7 @@
 
       <div class="modal-action">
         <form method="dialog" class="flex gap-2">
-          <button class="btn" @click="closeDialog">
-            取消
-          </button>
+          <button class="btn" @click="closeDialog">取消</button>
           <button
             class="btn btn-primary"
             @click="submitCustomProcess"

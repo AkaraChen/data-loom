@@ -111,6 +111,58 @@ export const useWorkspaceStore = defineStore(
     )
 
     /**
+     * 获取当前工作区状态的提示词
+     * @returns 包含系统提示和用户消息的对象
+     */
+    function getPrompt(): { systemPrompt: string; userMessage: string } {
+      // 系统提示包含任务描述
+      let systemPrompt =
+        '你是一个专业的内容生成助手，擅长根据用户的要求生成高质量的文档内容。'
+
+      if (taskDescription.value) {
+        systemPrompt += `\n\n任务描述: ${taskDescription.value}`
+      }
+
+      // 用户消息包含具体要求和上下文文件
+      let userMessage = ''
+
+      if (requirements.value) {
+        userMessage += `要求: ${requirements.value}\n\n`
+      }
+
+      // 添加上下文文件内容
+      if (contextFiles.value.length > 0) {
+        userMessage += `上下文文件:\n\n`
+
+        contextFiles.value.forEach(file => {
+          userMessage += `--- ${file.name} ---\n${file.content}\n\n`
+        })
+      }
+
+      userMessage += `请以${getOutputModeDescription(outputMode.value)}格式输出结果，直接输出文件内容，不要将内容放置在代码块中，除内容外不包含其他任何信息。`
+
+      return { systemPrompt, userMessage }
+    }
+
+    /**
+     * 获取输出模式的描述
+     */
+    function getOutputModeDescription(mode: OutputMode): string {
+      switch (mode) {
+        case 'plaintext':
+          return '纯文本'
+        case 'markdown':
+          return 'Markdown'
+        case 'csv':
+          return 'CSV'
+        case 'json':
+          return 'JSON'
+        default:
+          return 'Markdown'
+      }
+    }
+
+    /**
      * 创建新文件
      * @param fileName 文件名
      * @returns 新创建的文件ID
@@ -139,52 +191,6 @@ export const useWorkspaceStore = defineStore(
       isStreaming.value = DEFAULT_WORKSPACE.isStreaming
       outputMode.value = DEFAULT_WORKSPACE.outputMode
       contextFileIds.value = [...DEFAULT_WORKSPACE.contextFileIds] // 重置上下文文件ID数组
-    }
-
-    /**
-     * 获取当前工作区状态的提示词
-     */
-    function getPrompt(): string {
-      let prompt = ''
-
-      if (taskDescription.value) {
-        prompt += `任务描述: ${taskDescription.value}\n\n`
-      }
-
-      if (requirements.value) {
-        prompt += `要求: ${requirements.value}\n\n`
-      }
-
-      // 添加上下文文件内容
-      if (contextFiles.value.length > 0) {
-        prompt += `上下文文件:\n\n`
-
-        contextFiles.value.forEach(file => {
-          prompt += `--- ${file.name} ---\n${file.content}\n\n`
-        })
-      }
-
-      prompt += `请以${getOutputModeDescription(outputMode.value)}格式输出结果，直接输出文件内容，不要将内容放置在代码块中，除内容外不包含其他任何信息。`
-
-      return prompt
-    }
-
-    /**
-     * 获取输出模式的描述
-     */
-    function getOutputModeDescription(mode: OutputMode): string {
-      switch (mode) {
-        case 'plaintext':
-          return '纯文本'
-        case 'markdown':
-          return 'Markdown'
-        case 'csv':
-          return 'CSV'
-        case 'json':
-          return 'JSON'
-        default:
-          return 'Markdown'
-      }
     }
 
     /**

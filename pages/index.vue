@@ -133,13 +133,12 @@ const generateContent = async () => {
   resetChat()
 
   // 获取提示词
-  const prompt = workspaceStore.getPrompt()
+  const { systemPrompt, userMessage } = workspaceStore.getPrompt()
 
   // 发送消息到 OpenAI
   sendMessage({
-    content: prompt,
-    systemPrompt:
-      '你是一个专业的内容生成助手，擅长根据用户的要求生成高质量的文档内容。',
+    content: userMessage,
+    systemPrompt,
   })
 }
 
