@@ -3,7 +3,7 @@
     <!-- Sidebar -->
     <div class="w-64 bg-base-100 p-4 shadow-lg border-r border-base-300">
       <!-- Task Section -->
-      <TextSection
+      <UiTextSection
         icon="mdi:clipboard-text-outline"
         title="任务描述"
         placeholder="Enter task description..."
@@ -11,7 +11,7 @@
       />
 
       <!-- Requirements Section -->
-      <TextSection
+      <UiTextSection
         icon="mdi:chevron-right"
         title="要求"
         placeholder="Enter requirements..."
@@ -38,17 +38,17 @@
 
         <!-- Updated menu with full width hover -->
         <ul class="menu menu-compact w-full p-0">
-          <FileItem 
+          <EditorFileItem 
             fileName="a.txt"
             :isActive="activeFile === 'a.txt'"
             @click="activeFile = 'a.txt'"
           />
-          <FileItem 
+          <EditorFileItem 
             fileName="b.txt"
             :isActive="activeFile === 'b.txt'"
             @click="activeFile = 'b.txt'"
           />
-          <FileItem 
+          <EditorFileItem 
             fileName="c.txt"
             :isActive="activeFile === 'c.txt'"
             @click="activeFile = 'c.txt'"

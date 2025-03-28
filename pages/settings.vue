@@ -7,8 +7,8 @@
 
     <div class="grid grid-cols-1 gap-4">
       <!-- API Settings Section -->
-      <settings-section title="API 设置" icon="mdi:api">
-        <settings-item
+      <SettingsSection title="API 设置" icon="mdi:api">
+        <SettingsItem
           title="模型供应商"
           description="选择你想要使用的 AI 模型供应商"
         >
@@ -21,9 +21,9 @@
             <option value="google">Google</option>
             <option value="claude">Claude</option>
           </select>
-        </settings-item>
+        </SettingsItem>
 
-        <settings-item
+        <SettingsItem
           title="API Key"
           description="输入你的 API Key 以访问所选供应商的服务"
         >
@@ -41,9 +41,9 @@
               <Icon :name="showApiKey ? 'mdi:eye-off' : 'mdi:eye'" size="16" />
             </button>
           </div>
-        </settings-item>
+        </SettingsItem>
 
-        <settings-item
+        <SettingsItem
           title="API Endpoint"
           description="可选：自定义 API 端点，如果你需要使用非默认服务器"
         >
@@ -53,12 +53,12 @@
             placeholder="输入 API Endpoint（可选）"
             class="input input-bordered input-sm w-full"
           />
-        </settings-item>
-      </settings-section>
+        </SettingsItem>
+      </SettingsSection>
 
       <!-- UI Settings Section (Example) -->
-      <settings-section title="界面设置" icon="mdi:palette">
-        <settings-item title="主题" description="选择应用的显示主题">
+      <SettingsSection title="界面设置" icon="mdi:palette">
+        <SettingsItem title="主题" description="选择应用的显示主题">
           <select
             v-model="settingsStore.theme"
             class="select select-bordered select-sm w-full"
@@ -67,8 +67,8 @@
             <option value="dark">深色</option>
             <option value="system">跟随系统</option>
           </select>
-        </settings-item>
-      </settings-section>
+        </SettingsItem>
+      </SettingsSection>
     </div>
   </div>
 </template>
