@@ -214,14 +214,29 @@ const handleRenameFile = (fileId: string) => {
   const file = files.value.find(f => f.id === fileId)
   if (!file) return
 
-  const newName = prompt('输入新文件名', file.name)
-  if (newName && newName.trim()) {
+  // 解析文件名和扩展名
+  const fileNameParts = file.name.split('.')
+  const extension = fileNameParts.length > 1 ? fileNameParts.pop() || '' : ''
+  const currentBaseName = fileNameParts.join('.')
+
+  const newBaseName = prompt('输入新文件名（不包含扩展名）', currentBaseName)
+  
+  if (newBaseName && newBaseName.trim()) {
+    // 检查用户输入是否包含扩展名
+    if (newBaseName.includes('.')) {
+      alert('请不要输入扩展名，只需输入文件名')
+      return
+    }
+    
+    // 构建新的完整文件名（保留原扩展名）
+    const finalName = extension ? `${newBaseName.trim()}.${extension}` : newBaseName.trim()
+    
     const fileIndex = files.value.findIndex(f => f.id === fileId)
     if (fileIndex !== -1) {
       const updatedFiles = [...files.value]
       updatedFiles[fileIndex] = {
         ...updatedFiles[fileIndex],
-        name: newName,
+        name: finalName,
       }
       files.value = updatedFiles
     }

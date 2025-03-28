@@ -24,9 +24,15 @@
           class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
           @click.stop="isOpen = false"
         >
-          <li @click="$emit('rename')"><a>Rename</a></li>
-          <li @click="$emit('duplicate')"><a>Duplicate</a></li>
-          <li @click="$emit('delete')"><a class="text-error">Delete</a></li>
+          <li @click="$emit('rename')"><a>
+            <Icon name="mdi:rename" size="16" />
+            重命名</a></li>
+          <li @click="$emit('duplicate')"><a>
+            <Icon name="mdi:content-copy" size="16" />
+            复制</a></li>
+          <li @click="$emit('delete')"><a class="text-error">
+            <Icon name="mdi:delete" size="16" />
+            删除</a></li>
         </ul>
       </details>
     </a>
