@@ -1,3 +1,6 @@
 @import 'tailwindcss';
 @plugin "daisyui";
+@plugin 'tailwind-scrollbar' {
+  nocompatible: true;
+}
 @import './globals.css';

@@ -16,7 +16,7 @@
       </div>
 
       <!-- Document List -->
-      <div class="overflow-y-auto flex-1">
+      <div class="overflow-y-auto overflow-x-hidden flex-1">
         <ul class="menu menu-compact w-full p-0">
           <EditorFileItem
             v-for="file in files"
@@ -48,7 +48,7 @@
           已选择 {{ contextFiles.length }} 个文件作为上下文
         </div>
       </div>
-      <div class="overflow-y-auto flex-1 px-4 pb-4">
+      <div class="overflow-y-auto overflow-x-hidden flex-1 px-4 pb-4">
         <ul class="menu menu-compact w-full p-0 bg-base-200 rounded-box">
           <li
             v-for="file in contextFiles"

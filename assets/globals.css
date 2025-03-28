@@ -1,4 +1,4 @@
 :root {
-  overflow: hidden;
+  @apply scrollbar scrollbar-w-0;
   font-family: 'Noto Sans SC', sans-serif;
 }

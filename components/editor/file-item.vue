@@ -17,7 +17,7 @@
           @click.stop
         />
         <Icon name="mdi:file-outline" size="16" />
-        <span class="truncate max-w-[120px]" :title="fileName">{{
+        <span class="truncate max-w-[120px] w-[120px]" :title="fileName">{{
           fileName
         }}</span>
       </div>
