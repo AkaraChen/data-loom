@@ -13,19 +13,31 @@
 
     <!-- JSON Preview -->
     <div v-else-if="fileType === 'json'" class="json-preview relative h-full">
-      <pre v-if="jsonParseSuccess">{{ formattedJson }}</pre>
+      <JsonViewer v-if="jsonParseSuccess" :value="JSON.parse(modelValue)" />
       <div v-else class="flex items-center justify-center h-full w-full">
-        <div v-if="isStreaming" class="text-base-content/70 flex flex-col items-center">
+        <div
+          v-if="isStreaming"
+          class="text-base-content/70 flex flex-col items-center"
+        >
           <div class="loading loading-spinner loading-md mb-2"></div>
           <p>JSON 数据生成中...</p>
         </div>
         <div v-else class="flex flex-col items-center">
-          <div class="bg-base-200 rounded-lg px-8 py-4 text-center max-w-xs">
+          <div class="bg-base-200 rounded-lg px-8 py-6 max-w-xs gap-4">
             <div class="text-base-content/80 mb-2 flex gap-2 items-center">
               <Icon name="mdi:code-json" size="20" />
-              <span class="font-medium text-base-content/90">JSON 解析失败</span>
+              <span class="font-medium text-base-content/90"
+                >JSON 解析失败</span
+              >
             </div>
-            <span class="text-xs text-base-content/60 mt-2">请重新生成，或者进入源码模式手动修复。</span>
+            <div class="flex flex-col gap-2">
+              <span class="text-xs text-base-content/80">
+                请重新生成，或者进入源码模式手动修复。
+              </span>
+              <span class="text-xs text-base-content/60">
+                错误信息: {{ jsonErrorMessage }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -48,6 +60,9 @@ import { computed } from 'vue'
 import { marked } from 'marked'
 import 'github-markdown-css/github-markdown.css'
 import csvToMarkdown from 'csv-to-markdown-table'
+// @ts-ignore
+import { JsonViewer } from 'vue3-json-viewer'
+import 'vue3-json-viewer/dist/index.css'
 
 // 使用 defineModel 实现双向绑定
 const modelValue = defineModel<string>('modelValue', { default: '' })
@@ -60,8 +75,8 @@ defineProps({
   },
   isStreaming: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 // 渲染 Markdown 内容
