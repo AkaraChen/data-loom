@@ -36,8 +36,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { useEditorModel, type DocumentFile } from '~/composables/use-editor-model'
+import { ref } from 'vue'
+import type { DocumentFile } from '~/composables/use-editor-model'
 
 definePageMeta({
   layout: 'default',
@@ -47,38 +47,19 @@ const taskDescription = ref('')
 const requirements = ref('')
 
 // 初始化文件列表
-const initialFiles: DocumentFile[] = [
+const files = ref<DocumentFile[]>([
   {
     id: 'file-1',
     name: '示例文档.txt',
     content: '这是一个示例文档，你可以在这里编辑内容。'
   }
-]
+])
 
-// 使用编辑器模型
-const editorModel = useEditorModel({
-  initialFiles,
-  initialActiveFileId: 'file-1',
-  fileNamePrefix: '文档'
-})
+// 当前活动文件ID
+const activeFileId = ref<string>('file-1')
 
-// 暴露给组件的状态
-const files = ref(editorModel.files.value)
-const activeFileId = ref(editorModel.activeFileId.value)
-const activeFileContent = ref(editorModel.activeFileContent.value)
-
-// 同步编辑器模型状态变化
-watch(() => editorModel.files.value, (newFiles) => {
-  files.value = newFiles
-})
-
-watch(() => editorModel.activeFileId.value, (newId) => {
-  activeFileId.value = newId
-})
-
-watch(() => editorModel.activeFileContent.value, (newContent) => {
-  activeFileContent.value = newContent
-})
+// 活动文件内容
+const activeFileContent = ref<string>('这是一个示例文档，你可以在这里编辑内容。')
 
 // 处理文档
 const processDocument = (file: DocumentFile) => {
