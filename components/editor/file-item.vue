@@ -1,28 +1,32 @@
 <template>
-  <li class="w-full" ref="liRef">
+  <li
+    class="w-full"
+    ref="liRef"
+    @click="disabled ? null : $emit('click')"
+    :class="{ 'cursor-not-allowed opacity-70': disabled }"
+  >
     <a
-      class="w-full flex justify-start"
+      class="w-full flex justify-start active:!bg-transparent"
       :class="{
-        active: isActive,
-        'cursor-not-allowed opacity-70': disabled,
+        'btn-active': isActive,
       }"
-      @click="disabled ? null : $emit('click')"
     >
       <Icon name="mdi:file-outline" size="16" />
       {{ fileName }}
       <details class="dropdown ml-auto" ref="detailsRef" :open="isOpen">
-        <summary class="btn btn-ghost btn-square btn-xs" @click.stop>
+        <summary
+          class="btn btn-ghost btn-square btn-xs !bg-transparent !border-transparent"
+          @click.stop
+        >
           <Icon name="mdi:more-vert" size="16" />
         </summary>
         <ul
           class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
           @click.stop="isOpen = false"
         >
-          <li><a @click="$emit('rename')">Rename</a></li>
-          <li><a @click="$emit('duplicate')">Duplicate</a></li>
-          <li>
-            <a @click="$emit('delete')" class="text-error">Delete</a>
-          </li>
+          <li @click="$emit('rename')"><a>Rename</a></li>
+          <li @click="$emit('duplicate')"><a>Duplicate</a></li>
+          <li @click="$emit('delete')"><a class="text-error">Delete</a></li>
         </ul>
       </details>
     </a>
