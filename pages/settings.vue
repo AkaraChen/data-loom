@@ -1,52 +1,89 @@
 <template>
-  <div class="p-6">
-    <h1 class="text-2xl font-bold mb-4">设置</h1>
+  <div class="p-6 max-w-5xl mx-auto">
+    <div class="flex items-center gap-3 mb-8">
+      <Icon name="mdi:cog" size="32" class="text-primary" />
+      <h1 class="text-3xl font-bold">设置</h1>
+    </div>
     
-    <div class="card bg-base-100 shadow-xl">
-      <div class="card-body">
-        <h2 class="card-title mb-4">API 设置</h2>
+    <div class="grid grid-cols-1 gap-6">
+      <!-- API Settings Section -->
+      <SettingsSection title="API 设置" icon="mdi:api">
+        <SettingsItem 
+          title="模型供应商" 
+          description="选择你想要使用的 AI 模型供应商"
+        >
+          <select v-model="settings.provider" class="select select-bordered w-full">
+            <option disabled value="">请选择供应商</option>
+            <option value="openai">OpenAI</option>
+            <option value="google">Google</option>
+            <option value="claude">Claude</option>
+          </select>
+        </SettingsItem>
         
-        <form @submit.prevent="saveSettings">
-          <div class="form-control w-full max-w-md mb-4">
-            <label class="label">
-              <span class="label-text">模型供应商</span>
-            </label>
-            <select v-model="settings.provider" class="select select-bordered w-full">
-              <option disabled value="">请选择供应商</option>
-              <option value="openai">OpenAI</option>
-              <option value="google">Google</option>
-              <option value="claude">Claude</option>
-            </select>
-          </div>
-          
-          <div class="form-control w-full max-w-md mb-4">
-            <label class="label">
-              <span class="label-text">API Key</span>
-            </label>
+        <SettingsItem 
+          title="API Key" 
+          description="输入你的 API Key 以访问所选供应商的服务"
+        >
+          <div class="flex">
             <input 
-              type="password" 
+              :type="showApiKey ? 'text' : 'password'" 
               v-model="settings.apiKey" 
               placeholder="输入你的 API Key" 
-              class="input input-bordered w-full" 
+              class="input input-bordered flex-1" 
             />
+            <button 
+              class="btn btn-square btn-outline ml-2"
+              @click="toggleApiKeyVisibility"
+            >
+              <Icon :name="showApiKey ? 'mdi:eye-off' : 'mdi:eye'" size="20" />
+            </button>
           </div>
-          
-          <div class="form-control w-full max-w-md mb-6">
-            <label class="label">
-              <span class="label-text">API Endpoint</span>
-            </label>
-            <input 
-              type="text" 
-              v-model="settings.apiEndpoint" 
-              placeholder="输入 API Endpoint（可选）" 
-              class="input input-bordered w-full" 
-            />
-          </div>
-          
-          <div class="flex justify-end">
-            <button type="submit" class="btn btn-primary">保存设置</button>
-          </div>
-        </form>
+        </SettingsItem>
+        
+        <SettingsItem 
+          title="API Endpoint" 
+          description="可选：自定义 API 端点，如果你需要使用非默认服务器"
+        >
+          <input 
+            type="text" 
+            v-model="settings.apiEndpoint" 
+            placeholder="输入 API Endpoint（可选）" 
+            class="input input-bordered w-full" 
+          />
+        </SettingsItem>
+      </SettingsSection>
+      
+      <!-- UI Settings Section (Example) -->
+      <SettingsSection title="界面设置" icon="mdi:palette">
+        <SettingsItem 
+          title="主题" 
+          description="选择应用的显示主题"
+        >
+          <select v-model="settings.theme" class="select select-bordered w-full">
+            <option value="light">浅色</option>
+            <option value="dark">深色</option>
+            <option value="system">跟随系统</option>
+          </select>
+        </SettingsItem>
+      </SettingsSection>
+    </div>
+    
+    <!-- Save Button -->
+    <div class="mt-8 flex justify-end">
+      <button 
+        @click="saveSettings" 
+        class="btn btn-primary gap-2"
+      >
+        <Icon name="mdi:content-save" size="20" />
+        保存设置
+      </button>
+    </div>
+    
+    <!-- Notification -->
+    <div v-if="showNotification" class="toast toast-end">
+      <div class="alert alert-success">
+        <Icon name="mdi:check-circle" size="20" />
+        <span>设置已保存</span>
       </div>
     </div>
   </div>
@@ -54,25 +91,45 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import SettingsItem from '~/components/SettingsItem.vue';
+import SettingsSection from '~/components/SettingsSection.vue';
 
 const settings = ref({
   provider: '',
   apiKey: '',
-  apiEndpoint: ''
+  apiEndpoint: '',
+  theme: 'system'
 });
+
+const showApiKey = ref(false);
+const showNotification = ref(false);
 
 // 从本地存储加载设置
 const loadSettings = () => {
   const savedSettings = localStorage.getItem('data-loom-settings');
   if (savedSettings) {
-    settings.value = JSON.parse(savedSettings);
+    // Merge saved settings with defaults
+    settings.value = {
+      ...settings.value,
+      ...JSON.parse(savedSettings)
+    };
   }
 };
 
 // 保存设置到本地存储
 const saveSettings = () => {
   localStorage.setItem('data-loom-settings', JSON.stringify(settings.value));
-  alert('设置已保存');
+  
+  // Show notification
+  showNotification.value = true;
+  setTimeout(() => {
+    showNotification.value = false;
+  }, 3000);
+};
+
+// 切换 API Key 可见性
+const toggleApiKeyVisibility = () => {
+  showApiKey.value = !showApiKey.value;
 };
 
 // 页面加载时读取设置
