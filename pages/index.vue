@@ -5,10 +5,17 @@
       <!-- Task Section -->
       <div class="mb-6">
         <div class="flex items-center gap-2 mb-2">
-          <Icon name="mdi:clipboard-text-outline" size="20" class="text-primary" />
+          <Icon
+            name="mdi:clipboard-text-outline"
+            size="20"
+            class="text-primary"
+          />
           <h2 class="text-lg font-medium">任务描述</h2>
         </div>
-        <textarea class="textarea textarea-bordered w-full" placeholder="Enter task description..."></textarea>
+        <textarea
+          class="textarea textarea-bordered w-full"
+          placeholder="Enter task description..."
+        ></textarea>
       </div>
 
       <!-- Requirements Section -->
@@ -17,7 +24,10 @@
           <Icon name="mdi:chevron-right" size="20" class="text-primary" />
           <h2 class="text-lg font-medium">要求</h2>
         </div>
-        <textarea class="textarea textarea-bordered w-full" placeholder="Enter requirements..."></textarea>
+        <textarea
+          class="textarea textarea-bordered w-full"
+          placeholder="Enter requirements..."
+        ></textarea>
       </div>
 
       <!-- Action Button -->
@@ -37,7 +47,7 @@
             文档列表
           </h2>
         </div>
-        
+
         <!-- Updated menu with full width hover -->
         <ul class="menu menu-compact w-full p-0">
           <li class="w-full">
@@ -60,13 +70,15 @@
           </li>
         </ul>
       </div>
-      
+
       <!-- File Content (Right Side - VSCode Style) -->
       <div class="flex-1 flex flex-col">
         <!-- Editor Tabs -->
         <div class="flex bg-base-100 border-b border-base-content/10">
           <div class="flex-1 flex overflow-x-auto">
-            <div class="px-3 py-2 flex items-center gap-2 bg-base-100 border-r border-base-content/10">
+            <div
+              class="px-3 py-2 flex items-center gap-2 bg-base-100 border-r border-base-content/10"
+            >
               <Icon name="mdi:file-outline" size="16" class="text-primary" />
               <span>a.txt</span>
               <button class="btn btn-ghost btn-xs btn-circle">
@@ -75,14 +87,16 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Editor Content -->
         <div class="flex-1 overflow-auto bg-base-100 p-4 font-mono text-sm">
           Content will appear here...
         </div>
-        
+
         <!-- Editor Actions -->
-        <div class="flex justify-end p-2 bg-base-100 border-t border-base-content/10">
+        <div
+          class="flex justify-end p-2 bg-base-100 border-t border-base-content/10"
+        >
           <button class="btn btn-sm btn-primary gap-1">
             <Icon name="mdi:play" size="16" />
             处理
@@ -95,7 +109,7 @@
 
 <script setup>
 definePageMeta({
-  layout: 'default'
+  layout: 'default',
 })
 </script>
 
