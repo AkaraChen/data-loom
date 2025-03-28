@@ -20,7 +20,10 @@
           @click.stop
         />
         <Icon name="mdi:file-outline" size="16" />
-        {{ fileName }}
+        <span 
+          class="truncate max-w-[120px]" 
+          :title="fileName"
+        >{{ fileName }}</span>
       </div>
       <details class="dropdown ml-auto" ref="detailsRef" :open="isOpen">
         <summary
