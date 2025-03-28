@@ -71,15 +71,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useSettingsStore } from '~/stores/settings';
+import { useToggle } from '@vueuse/core';
 
 const settingsStore = useSettingsStore();
-const showApiKey = ref(false);
 
 // 切换 API Key 可见性
-const toggleApiKeyVisibility = () => 
-  showApiKey.value = !showApiKey.value;
+const [showApiKey,toggleApiKeyVisibility] = useToggle(false)
 
 definePageMeta({
   layout: 'default'
