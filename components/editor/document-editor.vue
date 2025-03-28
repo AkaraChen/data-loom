@@ -145,6 +145,9 @@
 
   <!-- 新建文件对话框 -->
   <EditorNewFileDialog ref="newFileDialog" @create="createNewFile" />
+  
+  <!-- 重命名文件对话框 -->
+  <EditorRenameFileDialog ref="renameFileDialog" @rename="confirmRenameFile" />
 </template>
 
 <script setup lang="ts">
@@ -236,6 +239,12 @@ const contextFiles = computed(() => {
 
 // 新建文件对话框引用
 const newFileDialog = ref<{ open: () => void } | null>(null)
+
+// 重命名文件对话框引用
+const renameFileDialog = ref<{ open: (fileName: string) => void } | null>(null)
+
+// 当前正在重命名的文件ID
+const renamingFileId = ref<string | null>(null)
 
 // 计算当前活动文件
 const activeFile = computed(() => {
@@ -343,20 +352,30 @@ const handleRenameFile = (fileId: string) => {
   const file = files.value.find(f => f.id === fileId)
   if (!file) return
 
-  // 使用 prompt 获取新文件名
-  const newName = prompt('输入新文件名:', file.name)
-  if (!newName || newName === file.name) return
+  // 保存当前正在重命名的文件ID
+  renamingFileId.value = fileId
+  
+  // 打开重命名对话框
+  renameFileDialog.value?.open(file.name)
+}
 
+// 确认重命名文件
+const confirmRenameFile = (newFileName: string) => {
+  if (!renamingFileId.value) return
+  
   // 更新文件名
-  const fileIndex = files.value.findIndex(f => f.id === fileId)
+  const fileIndex = files.value.findIndex(f => f.id === renamingFileId.value)
   if (fileIndex !== -1) {
     const updatedFiles = [...files.value]
     updatedFiles[fileIndex] = {
       ...updatedFiles[fileIndex],
-      name: newName,
+      name: newFileName,
     }
     files.value = updatedFiles
   }
+  
+  // 重置重命名文件ID
+  renamingFileId.value = null
 }
 
 // 复制文件
