@@ -4,11 +4,10 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  modules: ['@nuxt/icon'],
+  modules: ['@nuxt/icon', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt'],
   css: ['@/assets/app.css'],
   vite: {
     plugins: [
-      // @ts-expect-error fuck vite
       tailwindcss()
     ]
   }
