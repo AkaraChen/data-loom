@@ -118,6 +118,11 @@ const createNewFile = (fileName: string) => {
 
 // 关闭文件
 const closeFile = () => {
+  // 在 blocking 状态下禁止关闭文件
+  if (props.blocking) {
+    return
+  }
+
   activeFileId.value = null
 }
 

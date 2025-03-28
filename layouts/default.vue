@@ -5,7 +5,7 @@
       <div class="px-4 flex items-center h-14">
         <NuxtLink to="/" class="flex-1 flex items-center gap-3">
           <Icon name="mdi:lightning-bolt" size="24" class="text-primary" />
-          <span class="text-lg font-medium">Data Factory</span>
+          <span class="text-lg font-medium">Data Loom</span>
         </NuxtLink>
         <div>
           <NuxtLink to="/settings" class="btn btn-sm btn-ghost btn-circle">

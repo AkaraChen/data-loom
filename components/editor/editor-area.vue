@@ -12,6 +12,7 @@
           <button
             class="btn btn-ghost btn-xs btn-circle"
             @click="$emit('close-file')"
+            :disabled="disabled"
           >
             <Icon name="mdi:close" size="12" />
           </button>
