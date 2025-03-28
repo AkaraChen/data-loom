@@ -1,18 +1,18 @@
 <template>
-  <div class="p-6 max-w-5xl mx-auto">
-    <div class="flex items-center gap-3 mb-8">
-      <Icon name="mdi:cog" size="32" class="text-primary" />
-      <h1 class="text-3xl font-bold">设置</h1>
+  <div class="p-4 max-w-4xl mx-auto">
+    <div class="flex items-center gap-2 mb-4">
+      <Icon name="mdi:cog" size="24" class="text-primary" />
+      <h1 class="text-2xl font-bold">设置</h1>
     </div>
     
-    <div class="grid grid-cols-1 gap-6">
+    <div class="grid grid-cols-1 gap-4">
       <!-- API Settings Section -->
       <settings-section title="API 设置" icon="mdi:api">
         <settings-item 
           title="模型供应商" 
           description="选择你想要使用的 AI 模型供应商"
         >
-          <select v-model="settings.provider" class="select select-bordered w-full">
+          <select v-model="settings.provider" class="select select-bordered select-sm w-full">
             <option disabled value="">请选择供应商</option>
             <option value="openai">OpenAI</option>
             <option value="google">Google</option>
@@ -29,13 +29,13 @@
               :type="showApiKey ? 'text' : 'password'" 
               v-model="settings.apiKey" 
               placeholder="输入你的 API Key" 
-              class="input input-bordered flex-1" 
+              class="input input-bordered input-sm flex-1" 
             />
             <button 
-              class="btn btn-square btn-outline ml-2"
+              class="btn btn-square btn-outline btn-sm ml-1"
               @click="toggleApiKeyVisibility"
             >
-              <Icon :name="showApiKey ? 'mdi:eye-off' : 'mdi:eye'" size="20" />
+              <Icon :name="showApiKey ? 'mdi:eye-off' : 'mdi:eye'" size="16" />
             </button>
           </div>
         </settings-item>
@@ -48,7 +48,7 @@
             type="text" 
             v-model="settings.apiEndpoint" 
             placeholder="输入 API Endpoint（可选）" 
-            class="input input-bordered w-full" 
+            class="input input-bordered input-sm w-full" 
           />
         </settings-item>
       </settings-section>
@@ -59,7 +59,7 @@
           title="主题" 
           description="选择应用的显示主题"
         >
-          <select v-model="settings.theme" class="select select-bordered w-full">
+          <select v-model="settings.theme" class="select select-bordered select-sm w-full">
             <option value="light">浅色</option>
             <option value="dark">深色</option>
             <option value="system">跟随系统</option>
@@ -69,21 +69,21 @@
     </div>
     
     <!-- Save Button -->
-    <div class="mt-8 flex justify-end">
+    <div class="mt-4 flex justify-end">
       <button 
         @click="saveSettings" 
-        class="btn btn-primary gap-2"
+        class="btn btn-primary btn-sm gap-1"
       >
-        <Icon name="mdi:content-save" size="20" />
+        <Icon name="mdi:content-save" size="16" />
         保存设置
       </button>
     </div>
     
     <!-- Notification -->
     <div v-if="showNotification" class="toast toast-end">
-      <div class="alert alert-success">
-        <Icon name="mdi:check-circle" size="20" />
-        <span>设置已保存</span>
+      <div class="alert alert-success py-2 px-4 min-h-0">
+        <Icon name="mdi:check-circle" size="16" />
+        <span class="text-sm">设置已保存</span>
       </div>
     </div>
   </div>
