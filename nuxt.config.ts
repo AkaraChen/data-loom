@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     'pinia-plugin-persistedstate/nuxt',
     '@vueuse/nuxt',
     '@hebilicious/vue-query-nuxt',
+    'nuxt-monaco-editor',
   ],
   css: ['@/assets/app.css'],
   vite: {
