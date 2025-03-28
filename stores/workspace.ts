@@ -164,7 +164,7 @@ export const useWorkspaceStore = defineStore(
         })
       }
 
-      prompt += `请以${getOutputModeDescription(outputMode.value)}格式输出结果，直接输出文件内容，除此以外不包含其他任何信息。`
+      prompt += `请以${getOutputModeDescription(outputMode.value)}格式输出结果，直接输出文件内容，不要将内容放置在代码块中，除内容外不包含其他任何信息。`
 
       return prompt
     }
