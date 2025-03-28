@@ -42,10 +42,7 @@
           >
             <Icon name="mdi:file-outline" size="16" class="text-primary" />
             <span>{{ activeFile.name }}</span>
-            <button
-              class="btn btn-ghost btn-xs btn-circle"
-              @click="closeFile"
-            >
+            <button class="btn btn-ghost btn-xs btn-circle" @click="closeFile">
               <Icon name="mdi:close" size="12" />
             </button>
           </div>
@@ -182,7 +179,7 @@ const closeFile = () => {
 const updateFileContent = (event: Event) => {
   const content = (event.target as HTMLTextAreaElement).value
   activeFileContent.value = content
-  
+
   // 更新文件内容
   if (activeFile.value) {
     const fileIndex = files.value.findIndex(f => f.id === activeFileId.value)
@@ -190,7 +187,7 @@ const updateFileContent = (event: Event) => {
       const updatedFiles = [...files.value]
       updatedFiles[fileIndex] = {
         ...updatedFiles[fileIndex],
-        content
+        content,
       }
       files.value = updatedFiles
     }
@@ -216,7 +213,7 @@ const handleDeleteFile = (fileId: string) => {
 const handleRenameFile = (fileId: string) => {
   const file = files.value.find(f => f.id === fileId)
   if (!file) return
-  
+
   const newName = prompt('输入新文件名', file.name)
   if (newName && newName.trim()) {
     const fileIndex = files.value.findIndex(f => f.id === fileId)
@@ -224,7 +221,7 @@ const handleRenameFile = (fileId: string) => {
       const updatedFiles = [...files.value]
       updatedFiles[fileIndex] = {
         ...updatedFiles[fileIndex],
-        name: newName.endsWith('.txt') ? newName : `${newName}.txt`
+        name: newName.endsWith('.txt') ? newName : `${newName}.txt`,
       }
       files.value = updatedFiles
     }
@@ -235,16 +232,16 @@ const handleRenameFile = (fileId: string) => {
 const handleDuplicateFile = (fileId: string) => {
   const file = files.value.find(f => f.id === fileId)
   if (!file) return
-  
+
   const newId = `file-${Date.now()}`
   const newFile: DocumentFile = {
     id: newId,
     name: `${file.name.replace('.txt', '')} (复制).txt`,
     content: file.content,
   }
-  
+
   files.value = [...files.value, newFile]
-  
+
   // 只有在非阻塞状态下才更新活动文件ID
   if (!props.blocking) {
     activeFileId.value = newId

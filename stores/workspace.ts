@@ -1,6 +1,15 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
-import type { DocumentFile } from '~/composables/use-editor-model'
+
+// 文档文件接口
+export interface DocumentFile {
+  id: string
+  name: string
+  content: string
+}
+
+// 输出模式类型
+export type OutputMode = 'plaintext' | 'markdown' | 'csv' | 'json'
 
 /**
  * 默认工作区状态
@@ -12,6 +21,7 @@ export const DEFAULT_WORKSPACE = {
   activeFileId: null as string | null,
   activeFileContent: '',
   isStreaming: false,
+  outputMode: 'markdown' as OutputMode,
 }
 
 /**
@@ -27,6 +37,7 @@ export const useWorkspaceStore = defineStore(
     const activeFileId = ref<string | null>(DEFAULT_WORKSPACE.activeFileId)
     const activeFileContent = ref(DEFAULT_WORKSPACE.activeFileContent)
     const isStreaming = ref(DEFAULT_WORKSPACE.isStreaming)
+    const outputMode = ref<OutputMode>(DEFAULT_WORKSPACE.outputMode)
 
     // 计算属性：当前活动文件
     const activeFile = computed(
@@ -52,7 +63,12 @@ export const useWorkspaceStore = defineStore(
           f => f.id === activeFileId.value,
         )
         if (fileIndex !== -1) {
-          files.value[fileIndex].content = newContent
+          const updatedFiles = [...files.value]
+          updatedFiles[fileIndex] = {
+            ...updatedFiles[fileIndex],
+            content: newContent,
+          }
+          files.value = updatedFiles
         }
       }
     })
@@ -85,18 +101,44 @@ export const useWorkspaceStore = defineStore(
       activeFileId.value = DEFAULT_WORKSPACE.activeFileId
       activeFileContent.value = DEFAULT_WORKSPACE.activeFileContent
       isStreaming.value = DEFAULT_WORKSPACE.isStreaming
+      outputMode.value = DEFAULT_WORKSPACE.outputMode
     }
 
     /**
      * 获取当前工作区状态的提示词
      */
     function getPrompt(): string {
-      return `
-任务描述: ${taskDescription.value}
-要求: ${requirements.value}
+      let prompt = ''
 
-请根据以上信息生成内容。
-`
+      if (taskDescription.value) {
+        prompt += `任务描述: ${taskDescription.value}\n\n`
+      }
+
+      if (requirements.value) {
+        prompt += `要求: ${requirements.value}\n\n`
+      }
+
+      prompt += `请以${getOutputModeDescription(outputMode.value)}格式输出结果，直接输出文件内容，除此以外不包含其他任何信息。`
+
+      return prompt
+    }
+
+    /**
+     * 获取输出模式的描述
+     */
+    function getOutputModeDescription(mode: OutputMode): string {
+      switch (mode) {
+        case 'plaintext':
+          return '纯文本'
+        case 'markdown':
+          return 'Markdown'
+        case 'csv':
+          return 'CSV'
+        case 'json':
+          return 'JSON'
+        default:
+          return 'Markdown'
+      }
     }
 
     return {
@@ -107,6 +149,7 @@ export const useWorkspaceStore = defineStore(
       activeFileContent,
       isStreaming,
       activeFile,
+      outputMode,
       createFile,
       resetWorkspace,
       getPrompt,
