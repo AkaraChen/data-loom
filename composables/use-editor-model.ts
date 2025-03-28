@@ -46,38 +46,44 @@ export interface EditorModelOptions {
 
 /**
  * 文档编辑器模型组合式函数
- * 
+ *
  * @param options 编辑器选项
  * @returns 编辑器模型接口
  */
-export function useEditorModel(options: EditorModelOptions = {}): EditorModelReturn {
+export function useEditorModel(
+  options: EditorModelOptions = {},
+): EditorModelReturn {
   const {
     initialFiles = [],
     initialActiveFileId = null,
-    fileNamePrefix = '新文件'
+    fileNamePrefix = '新文件',
   } = options
 
   // 文件列表
   const files = ref<DocumentFile[]>(initialFiles) as Ref<DocumentFile[]>
-  
+
   // 当前活动文件ID
   const activeFileId = ref<string | null>(initialActiveFileId)
-  
+
   // 当前活动文件内容
   const activeFileContent = ref<string>('')
-  
+
   // 计算当前活动文件
   const activeFile = computed(() => {
     return files.value.find(file => file.id === activeFileId.value) || null
   })
 
   // 监听活动文件变化，更新内容
-  watch(activeFile, (newFile) => {
-    activeFileContent.value = newFile?.content || ''
-  }, { immediate: true })
+  watch(
+    activeFile,
+    newFile => {
+      activeFileContent.value = newFile?.content || ''
+    },
+    { immediate: true },
+  )
 
   // 监听内容变化，更新文件
-  watch(activeFileContent, (newContent) => {
+  watch(activeFileContent, newContent => {
     if (activeFile.value) {
       const updatedFiles = files.value.map(file => {
         if (file.id === activeFileId.value) {
@@ -97,7 +103,7 @@ export function useEditorModel(options: EditorModelOptions = {}): EditorModelRet
     const newFile = {
       id: newId,
       name: `${fileNamePrefix}-${files.value.length + 1}.txt`,
-      content: ''
+      content: '',
     }
     files.value = [...files.value, newFile]
     activeFileId.value = newId
@@ -140,6 +146,6 @@ export function useEditorModel(options: EditorModelOptions = {}): EditorModelRet
     addNewFile,
     closeFile,
     updateFileContent,
-    processFile
+    processFile,
   }
 }

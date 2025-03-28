@@ -53,7 +53,9 @@ const files = ref<DocumentFile[]>([])
 const activeFileId = ref<string | null>(null)
 
 // 活动文件内容
-const activeFileContent = ref<string>('这是一个示例文档，你可以在这里编辑内容。')
+const activeFileContent = ref<string>(
+  '这是一个示例文档，你可以在这里编辑内容。',
+)
 
 // 处理文档
 const processDocument = (file: DocumentFile) => {

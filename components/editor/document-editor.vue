@@ -7,14 +7,17 @@
           <Icon name="mdi:folder-outline" size="20" class="text-primary" />
           文档列表
         </h2>
-        <button class="btn btn-ghost btn-sm btn-circle" @click="showNewFileDialog">
+        <button
+          class="btn btn-ghost btn-sm btn-circle"
+          @click="showNewFileDialog"
+        >
           <Icon name="mdi:plus" size="16" />
         </button>
       </div>
 
       <!-- Document List -->
       <ul class="menu menu-compact w-full p-0">
-        <EditorFileItem 
+        <EditorFileItem
           v-for="file in files"
           :key="file.id"
           :fileName="file.name"
@@ -36,7 +39,7 @@
           >
             <Icon name="mdi:file-outline" size="16" class="text-primary" />
             <span>{{ activeFile.name }}</span>
-            <button 
+            <button
               class="btn btn-ghost btn-xs btn-circle"
               @click="editorModel.closeFile"
             >
@@ -53,9 +56,17 @@
           class="textarea !border-transparent !outline-none w-full h-full"
           placeholder="Enter content..."
           :value="activeFileContent"
-          @input="(e) => editorModel.updateFileContent((e.target as HTMLTextAreaElement).value)"
+          @input="
+            e =>
+              editorModel.updateFileContent(
+                (e.target as HTMLTextAreaElement).value,
+              )
+          "
         ></textarea>
-        <div v-else class="flex items-center justify-center h-full text-base-content/50">
+        <div
+          v-else
+          class="flex items-center justify-center h-full text-base-content/50"
+        >
           <p>选择或创建一个文件开始编辑</p>
         </div>
       </div>
@@ -64,7 +75,7 @@
       <div
         class="flex justify-end p-2 bg-base-100 border-t border-base-content/10"
       >
-        <button 
+        <button
           class="btn btn-sm btn-primary gap-1"
           :disabled="!activeFile"
           @click="handleProcessFile"
@@ -75,21 +86,24 @@
       </div>
     </div>
   </div>
-  
+
   <!-- 新建文件对话框 -->
   <EditorNewFileDialog ref="newFileDialog" @create="createNewFile" />
 </template>
 
 <script setup lang="ts">
 import { computed, watch, ref } from 'vue'
-import { useEditorModel, type DocumentFile } from '~/composables/use-editor-model'
+import {
+  useEditorModel,
+  type DocumentFile,
+} from '~/composables/use-editor-model'
 
 // 定义属性
 const props = defineProps({
   blocking: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 // 定义事件
@@ -97,8 +111,12 @@ const emit = defineEmits(['process', 'fileSelectBlocked'])
 
 // 使用 defineModel 暴露接口
 const files = defineModel<DocumentFile[]>('files', { default: () => [] })
-const activeFileId = defineModel<string | null>('activeFileId', { default: null })
-const activeFileContent = defineModel<string>('activeFileContent', { default: '' })
+const activeFileId = defineModel<string | null>('activeFileId', {
+  default: null,
+})
+const activeFileContent = defineModel<string>('activeFileContent', {
+  default: '',
+})
 
 // 新建文件对话框引用
 const newFileDialog = ref<{ open: () => void } | null>(null)
@@ -110,7 +128,7 @@ const handleFileSelect = (fileId: string) => {
     emit('fileSelectBlocked', fileId)
     return
   }
-  
+
   // 非阻塞状态，正常更新活动文件
   activeFileId.value = fileId
 }
@@ -126,11 +144,11 @@ const createNewFile = (fileName: string) => {
   const newFile: DocumentFile = {
     id: newId,
     name: fileName.endsWith('.txt') ? fileName : `${fileName}.txt`,
-    content: ''
+    content: '',
   }
-  
+
   files.value = [...files.value, newFile]
-  
+
   // 只有在非阻塞状态下才更新活动文件ID
   if (!props.blocking) {
     activeFileId.value = newId
@@ -143,46 +161,71 @@ const createNewFile = (fileName: string) => {
 const editorModel = useEditorModel({
   initialFiles: files.value,
   initialActiveFileId: activeFileId.value,
-  fileNamePrefix: '新文件'
+  fileNamePrefix: '新文件',
 })
 
 // 计算当前活动文件 - 用于模板中访问
 const activeFile = computed(() => editorModel.activeFile.value)
 
 // 同步模型和组件状态
-watch(() => editorModel.files.value, (newFiles) => {
-  files.value = newFiles
-}, { immediate: true })
+watch(
+  () => editorModel.files.value,
+  newFiles => {
+    files.value = newFiles
+  },
+  { immediate: true },
+)
 
-watch(() => editorModel.activeFileId.value, (newActiveFileId) => {
-  // 只有在非阻塞状态下才更新活动文件ID
-  if (!props.blocking) {
-    activeFileId.value = newActiveFileId
-  }
-}, { immediate: true })
+watch(
+  () => editorModel.activeFileId.value,
+  newActiveFileId => {
+    // 只有在非阻塞状态下才更新活动文件ID
+    if (!props.blocking) {
+      activeFileId.value = newActiveFileId
+    }
+  },
+  { immediate: true },
+)
 
-watch(() => editorModel.activeFileContent.value, (newContent) => {
-  activeFileContent.value = newContent
-}, { immediate: true })
+watch(
+  () => editorModel.activeFileContent.value,
+  newContent => {
+    activeFileContent.value = newContent
+  },
+  { immediate: true },
+)
 
 // 同步组件状态到模型
-watch(() => files.value, (newFiles) => {
-  if (newFiles && JSON.stringify(newFiles) !== JSON.stringify(editorModel.files.value)) {
-    editorModel.files.value = newFiles
-  }
-}, { deep: true })
+watch(
+  () => files.value,
+  newFiles => {
+    if (
+      newFiles &&
+      JSON.stringify(newFiles) !== JSON.stringify(editorModel.files.value)
+    ) {
+      editorModel.files.value = newFiles
+    }
+  },
+  { deep: true },
+)
 
-watch(() => activeFileId.value, (newActiveFileId) => {
-  if (newActiveFileId !== editorModel.activeFileId.value) {
-    editorModel.activeFileId.value = newActiveFileId
-  }
-})
+watch(
+  () => activeFileId.value,
+  newActiveFileId => {
+    if (newActiveFileId !== editorModel.activeFileId.value) {
+      editorModel.activeFileId.value = newActiveFileId
+    }
+  },
+)
 
-watch(() => activeFileContent.value, (newContent) => {
-  if (newContent !== editorModel.activeFileContent.value) {
-    editorModel.updateFileContent(newContent)
-  }
-})
+watch(
+  () => activeFileContent.value,
+  newContent => {
+    if (newContent !== editorModel.activeFileContent.value) {
+      editorModel.updateFileContent(newContent)
+    }
+  },
+)
 
 // 处理文件
 const handleProcessFile = () => {

@@ -1,10 +1,10 @@
 <template>
   <li class="w-full">
-    <a 
-      class="w-full flex justify-start" 
-      :class="{ 
-        'active': isActive,
-        'cursor-not-allowed opacity-70': disabled
+    <a
+      class="w-full flex justify-start"
+      :class="{
+        active: isActive,
+        'cursor-not-allowed opacity-70': disabled,
       }"
       @click="$emit('click')"
     >
@@ -18,16 +18,16 @@
 defineProps({
   fileName: {
     type: String,
-    required: true
+    required: true,
   },
   isActive: {
     type: Boolean,
-    default: false
+    default: false,
   },
   disabled: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 defineEmits(['click'])
