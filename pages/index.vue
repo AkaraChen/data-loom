@@ -89,8 +89,11 @@
         </div>
 
         <!-- Editor Content -->
-        <div class="flex-1 overflow-auto bg-base-100 p-4 font-mono text-sm">
-          Content will appear here...
+        <div class="flex-1 overflow-auto bg-base-100 p-0.5 font-mono text-sm">
+          <textarea
+            class="textarea !border-transparent !outline-none w-full h-full"
+            placeholder="Enter content..."
+          ></textarea>
         </div>
 
         <!-- Editor Actions -->
