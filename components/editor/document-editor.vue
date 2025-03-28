@@ -1,7 +1,9 @@
 <template>
   <div class="flex-1 flex">
     <!-- File Explorer (Left Side) -->
-    <div class="w-64 bg-base-100 border-r border-base-300 p-4 flex flex-col h-full">
+    <div
+      class="w-64 bg-base-100 border-r border-base-300 p-4 flex flex-col h-full"
+    >
       <!-- Document List Section - Max 2/3 height -->
       <div class="flex flex-col h-full max-h-[66%] min-h-[200px]">
         <div class="flex items-center justify-between mb-2">
@@ -37,7 +39,10 @@
       </div>
 
       <!-- Context Files Section - Max 1/3 height -->
-      <div v-if="contextFiles.length > 0" class="mt-4 flex-1 max-h-[33%] flex flex-col">
+      <div
+        v-if="contextFiles.length > 0"
+        class="mt-4 flex-1 max-h-[33%] flex flex-col"
+      >
         <div class="mb-2">
           <h3 class="font-medium flex items-center gap-2">
             <Icon name="mdi:link-variant" size="16" class="text-primary" />
@@ -81,8 +86,8 @@
 
       <!-- Editor Content -->
       <div class="flex-1 overflow-auto bg-base-100 p-0.5 font-mono text-sm">
-        <EditorContentPreview 
-          v-if="isPreviewMode && activeFile" 
+        <EditorContentPreview
+          v-if="isPreviewMode && activeFile"
           v-model="activeFileContent"
           :fileType="getFileExtension(activeFile?.name || '')"
         />
@@ -111,7 +116,10 @@
             @click="togglePreviewMode"
             :class="{ 'btn-active': isPreviewMode }"
           >
-            <Icon :name="isPreviewMode ? 'mdi:eye' : 'mdi:code-tags'" size="16" />
+            <Icon
+              :name="isPreviewMode ? 'mdi:eye' : 'mdi:code-tags'"
+              size="16"
+            />
             {{ isPreviewMode ? '预览' : '源码' }}
           </button>
         </div>
@@ -133,7 +141,7 @@
 
 <script setup lang="ts">
 import { computed, watch, ref, reactive } from 'vue'
-import {marked} from 'marked'
+import { marked } from 'marked'
 import EditorContentPreview from './content-preview.vue'
 
 // 文档文件接口

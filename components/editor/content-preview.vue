@@ -2,33 +2,44 @@
   <div class="content-preview markdown-body">
     <!-- Markdown Preview -->
     <div v-if="fileType === 'md'" v-html="renderedMarkdown"></div>
-    
+
     <!-- Plain Text Preview -->
-    <div v-else-if="fileType === 'txt'" class="plain-text-preview whitespace-pre-wrap">{{ modelValue }}</div>
-    
+    <div
+      v-else-if="fileType === 'txt'"
+      class="plain-text-preview whitespace-pre-wrap"
+    >
+      {{ modelValue }}
+    </div>
+
     <!-- JSON Preview -->
     <div v-else-if="fileType === 'json'" class="json-preview">
       <pre>{{ formattedJson }}</pre>
     </div>
-    
+
     <!-- CSV Preview -->
     <div v-else-if="fileType === 'csv'" class="csv-preview">
       <table class="table table-compact w-full">
         <thead v-if="csvData.length > 0">
           <tr>
-            <th v-for="(header, index) in csvData[0]" :key="index">{{ header }}</th>
+            <th v-for="(header, index) in csvData[0]" :key="index">
+              {{ header }}
+            </th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(row, rowIndex) in csvData.slice(1)" :key="rowIndex">
-            <td v-for="(cell, cellIndex) in row" :key="cellIndex">{{ cell }}</td>
+            <td v-for="(cell, cellIndex) in row" :key="cellIndex">
+              {{ cell }}
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
-    
+
     <!-- Default Preview (Fallback to plain text) -->
-    <div v-else class="plain-text-preview whitespace-pre-wrap">{{ modelValue }}</div>
+    <div v-else class="plain-text-preview whitespace-pre-wrap">
+      {{ modelValue }}
+    </div>
   </div>
 </template>
 
@@ -66,7 +77,7 @@ const formattedJson = computed(() => {
 // 解析 CSV 内容
 const csvData = computed(() => {
   if (!modelValue.value) return []
-  
+
   const rows = modelValue.value.split('\n')
   return rows.map(row => row.split(',').map(cell => cell.trim()))
 })
@@ -101,7 +112,8 @@ const csvData = computed(() => {
   border-collapse: collapse;
 }
 
-.csv-preview th, .csv-preview td {
+.csv-preview th,
+.csv-preview td {
   border: 1px solid var(--b3);
   padding: 0.25rem 0.5rem;
 }
