@@ -5,12 +5,7 @@
     @click="disabled ? null : $emit('click')"
     :class="{ 'cursor-not-allowed opacity-70': disabled }"
   >
-    <a
-      class="w-full flex justify-start active:!bg-transparent"
-      :class="{
-        'btn-active': isActive,
-      }"
-    >
+    <a class="w-full flex justify-start active:!bg-transparent">
       <div class="flex items-center gap-2">
         <input
           type="checkbox"

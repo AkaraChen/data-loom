@@ -91,13 +91,20 @@
           v-model="activeFileContent"
           :fileType="getFileExtension(activeFile?.name || '')"
         />
-        <textarea
+        <MonacoEditor
+          v-else-if="activeFile"
+          v-model="activeFileContent"
+          :lang="getFileExtension(activeFile?.name || '')"
+          @update:modelValue="updateFileContent"
+          class="w-full h-full"
+        />
+        <!-- <textarea
           v-else-if="activeFile"
           class="textarea !border-transparent !outline-none w-full h-full"
           placeholder="Enter content..."
           :value="activeFileContent"
           @input="updateFileContent($event)"
-        ></textarea>
+        ></textarea> -->
         <div
           v-else
           class="flex items-center justify-center h-full text-base-content/50"
@@ -141,7 +148,6 @@
 
 <script setup lang="ts">
 import { computed, watch, ref, reactive } from 'vue'
-import { marked } from 'marked'
 import EditorContentPreview from './content-preview.vue'
 
 // 文档文件接口
@@ -288,8 +294,7 @@ const closeFile = () => {
 }
 
 // 更新文件内容
-const updateFileContent = (event: Event) => {
-  const content = (event.target as HTMLTextAreaElement).value
+const updateFileContent = (content: string) => {
   activeFileContent.value = content
 
   // 更新文件内容
