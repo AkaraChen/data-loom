@@ -12,9 +12,9 @@
     </div>
 
     <!-- JSON Preview -->
-    <div v-else-if="fileType === 'json'" class="json-preview">
+    <div v-else-if="fileType === 'json'" class="json-preview relative h-full">
       <pre v-if="jsonParseSuccess">{{ formattedJson }}</pre>
-      <div v-else class="flex items-center justify-center h-full">
+      <div v-else class="flex items-center justify-center h-full w-full">
         <div v-if="isStreaming" class="text-base-content/70 flex flex-col items-center">
           <div class="loading loading-spinner loading-md mb-2"></div>
           <p>JSON 数据生成中...</p>
