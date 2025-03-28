@@ -296,10 +296,18 @@ const showNewFileDialog = () => {
 // 创建新文件
 const createNewFile = (fileName: string) => {
   const newId = `file-${Date.now()}`
+  let initialContent = ''
+  
+  // 为特定文件类型设置默认内容
+  const fileExt = getFileExtension(fileName)
+  if (fileExt === 'json') {
+    initialContent = '{}'
+  }
+  
   const newFile: DocumentFile = {
     id: newId,
     name: fileName,
-    content: '',
+    content: initialContent,
   }
 
   files.value = [...files.value, newFile]
