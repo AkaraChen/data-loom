@@ -115,7 +115,9 @@
 </template>
 
 <script setup>
-// 页面逻辑
+definePageMeta({
+  layout: 'default'
+})
 </script>
 
 <style>

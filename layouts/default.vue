@@ -3,12 +3,12 @@
     <!-- Navbar - Simplified with just gear icon and aligned padding -->
     <div class="bg-base-100 border-b border-base-300">
       <div class="px-4 flex items-center h-14">
-        <div class="flex-1 flex items-center gap-3">
+        <NuxtLink to="/" class="flex-1 flex items-center gap-3">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
           <span class="text-lg font-medium">Data Factory</span>
-        </div>
+        </NuxtLink>
         <div>
           <NuxtLink to="/settings" class="btn btn-sm btn-ghost btn-circle">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -19,12 +19,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Page Content -->
     <slot />
   </div>
 </template>
-
-<script setup>
-// Layout component logic if needed
-</script>
