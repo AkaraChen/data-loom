@@ -233,10 +233,36 @@ const handleDuplicateFile = (fileId: string) => {
   const file = files.value.find(f => f.id === fileId)
   if (!file) return
 
+  // 解析文件名和扩展名
+  const fileNameParts = file.name.split('.')
+  const extension = fileNameParts.length > 1 ? fileNameParts.pop() || '' : ''
+  const baseName = fileNameParts.join('.')
+  
+  // 检查文件名中是否已经包含"复制"字样
+  const copyRegex = /\(复制(?:\s*\d*)?\)$/
+  const hasCopyText = copyRegex.test(baseName)
+  
+  let newName
+  if (hasCopyText) {
+    // 如果已经有"复制"字样，则添加数字或增加数字
+    const match = baseName.match(/\(复制(?:\s*(\d+))?\)$/)
+    const copyNumber = match && match[1] ? parseInt(match[1], 10) + 1 : 1
+    const baseNameWithoutCopy = baseName.replace(copyRegex, '').trim()
+    newName = copyNumber > 1 
+      ? `${baseNameWithoutCopy} (复制 ${copyNumber})` 
+      : `${baseNameWithoutCopy} (复制 1)`
+  } else {
+    // 如果没有"复制"字样，则添加
+    newName = `${baseName} (复制)`
+  }
+  
+  // 添加扩展名
+  const finalName = extension ? `${newName}.${extension}` : newName
+
   const newId = `file-${Date.now()}`
   const newFile: DocumentFile = {
     id: newId,
-    name: `${file.name.replace('.txt', '')} (复制).txt`,
+    name: finalName,
     content: file.content,
   }
 
