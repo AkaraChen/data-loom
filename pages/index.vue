@@ -74,27 +74,49 @@ const {
   },
 })
 
+// 初始化处理文件的聊天功能
+const {
+  sendMessage: processFile,
+  isStreaming: isProcessing,
+  abortChat: abortProcess,
+  reset: resetProcessChat,
+} = useChat({
+  onUpdate: text => {
+    // 实时更新活动文件内容
+    if (workspaceStore.activeFileId) {
+      workspaceStore.activeFileContent = text
+    }
+  },
+})
+
 // 监听流式传输状态变化
 watch(
-  () => isStreaming.value,
+  () => isStreaming.value || isProcessing.value,
   newValue => {
     workspaceStore.isStreaming = newValue
   },
 )
 
 // 处理文件处理请求
-const handleProcessFile = (file: DocumentFile) => {
-  // 重置聊天内容
-  resetChat()
-
-  // 获取提示词
-  const prompt = workspaceStore.getPrompt()
-
-  // 发送消息到 OpenAI
-  sendMessage({
-    content: prompt,
-    systemPrompt:
-      '你是一个专业的内容生成助手，擅长根据用户的要求生成高质量的文档内容。',
+const handleProcessFile = (data: { file: DocumentFile, action: any }) => {
+  // 重置处理聊天内容
+  resetProcessChat()
+  
+  // 准备文件内容
+  const fileContent = data.file.content
+  const fileName = data.file.name
+  
+  // 获取自定义提示
+  const customPrompt = typeof data.action === 'string' ? '' : data.action.prompt
+  
+  // 生成系统提示和用户提示
+  const systemPrompt = `你是一个专业的内容处理助手，擅长根据用户的特定要求处理文档内容。文件名: ${fileName}`
+  const userPrompt = `文件内容：\n\n${fileContent}\n\n处理要求：${customPrompt}`
+  
+  // 发送处理请求
+  processFile({
+    content: userPrompt,
+    systemPrompt
   })
 }
 
