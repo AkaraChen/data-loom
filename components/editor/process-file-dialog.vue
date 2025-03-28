@@ -23,7 +23,10 @@
       </div>
 
       <div class="modal-action">
-        <form method="dialog">
+        <form method="dialog" class="flex gap-2">
+          <button class="btn" @click="closeDialog">
+            取消
+          </button>
           <button
             class="btn btn-primary"
             @click="submitCustomProcess"
@@ -63,6 +66,11 @@ const submitCustomProcess = () => {
     emit('process', { action: 'custom', prompt: customPrompt.value.trim() })
     dialogRef.value?.close()
   }
+}
+
+// 关闭对话框
+const closeDialog = () => {
+  dialogRef.value?.close()
 }
 
 // 打开对话框的方法 - 可以从父组件调用
