@@ -91,8 +91,6 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import SettingsItem from '~/components/settings-item.vue';
-import SettingsSection from '~/components/settings-section.vue';
 
 const settings = ref({
   provider: '',
