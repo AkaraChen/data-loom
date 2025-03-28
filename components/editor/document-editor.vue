@@ -133,7 +133,7 @@
         </div>
         <button
           class="btn btn-sm btn-primary gap-1"
-          :disabled="!activeFile"
+          :disabled="!activeFile || props.blocking"
           @click="handleProcessFile"
         >
           <Icon name="mdi:play" size="16" />
@@ -148,6 +148,9 @@
   
   <!-- 重命名文件对话框 -->
   <EditorRenameFileDialog ref="renameFileDialog" @rename="confirmRenameFile" />
+  
+  <!-- 处理文件对话框 -->
+  <EditorProcessFileDialog ref="processFileDialog" @process="handleProcessAction" />
 </template>
 
 <script setup lang="ts">
@@ -243,6 +246,9 @@ const newFileDialog = ref<{ open: () => void } | null>(null)
 // 重命名文件对话框引用
 const renameFileDialog = ref<{ open: (fileName: string) => void } | null>(null)
 
+// 处理文件对话框引用
+const processFileDialog = ref<{ open: (fileName: string) => void } | null>(null)
+
 // 当前正在重命名的文件ID
 const renamingFileId = ref<string | null>(null)
 
@@ -324,7 +330,16 @@ const updateFileContent = (content: string) => {
 // 处理文件
 const handleProcessFile = () => {
   if (activeFile.value) {
-    emit('process', activeFile.value)
+    // 打开处理文件对话框
+    processFileDialog.value?.open(activeFile.value.name)
+  }
+}
+
+// 处理文件动作
+const handleProcessAction = (action: string) => {
+  if (activeFile.value) {
+    // 将处理动作和文件一起发送给父组件
+    emit('process', { file: activeFile.value, action })
   }
 }
 
