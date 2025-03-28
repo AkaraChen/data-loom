@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/vue-query'
 import { useSettingsStore } from '~/stores/settings'
-import OpenAI from 'openai'
+import { useOpenAI } from '~/composables/use-openai'
 
 /**
  * Composable for fetching available OpenAI models
@@ -8,40 +8,14 @@ import OpenAI from 'openai'
  */
 export function useModels() {
   const settingsStore = useSettingsStore()
-
-  // Initialize OpenAI client
-  const getOpenAIClient = () => {
-    const apiKey = settingsStore.apiKey
-
-    if (!apiKey) {
-      throw new Error(
-        'API key is not set. Please configure it in the settings.',
-      )
-    }
-
-    const clientOptions: {
-      apiKey: string;
-      dangerouslyAllowBrowser: boolean;
-      baseURL?: string;
-    } = {
-      apiKey,
-      dangerouslyAllowBrowser: true,
-    }
-
-    // Use custom API endpoint if provided
-    if (settingsStore.apiEndpoint) {
-      clientOptions.baseURL = settingsStore.apiEndpoint
-    }
-
-    return new OpenAI(clientOptions)
-  }
+  const { getClient, canCreateClient } = useOpenAI()
 
   // Query for fetching models
   const modelsQuery = useQuery({
     queryKey: ['models', settingsStore.apiKey, settingsStore.apiEndpoint],
     queryFn: async () => {
       try {
-        const openai = getOpenAIClient()
+        const openai = getClient()
         const response = await openai.models.list()
         
         // Filter for chat completion models and sort by ID
@@ -60,7 +34,7 @@ export function useModels() {
       }
     },
     // Only run the query if we have an API key
-    enabled: computed(() => !!settingsStore.apiKey),
+    enabled: canCreateClient,
     // Cache the result for 1 hour
     staleTime: 60 * 60 * 1000,
   })

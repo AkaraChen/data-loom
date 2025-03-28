@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/vue-query'
 import { useSettingsStore } from '~/stores/settings'
-import OpenAI, { type ClientOptions } from 'openai'
+import { useOpenAI } from '~/composables/use-openai'
+import OpenAI from 'openai'
 
 /**
  * Chat options interface
@@ -48,34 +49,12 @@ export interface ChatResponse {
  */
 export function useChat(options: ChatOptions = {}) {
   const settingsStore = useSettingsStore()
+  const { getClient } = useOpenAI()
   const streamedText = ref('')
 
   // Reset streamed text
   const resetStreamedText = () => {
     streamedText.value = ''
-  }
-
-  // Initialize OpenAI client
-  const getOpenAIClient = () => {
-    const apiKey = settingsStore.apiKey
-
-    if (!apiKey) {
-      throw new Error(
-        'API key is not set. Please configure it in the settings.',
-      )
-    }
-
-    const clientOptions: ClientOptions = {
-      apiKey,
-      dangerouslyAllowBrowser: true,
-    }
-
-    // Use custom API endpoint if provided
-    if (settingsStore.apiEndpoint) {
-      clientOptions.baseURL = settingsStore.apiEndpoint
-    }
-
-    return new OpenAI(clientOptions)
   }
 
   // Create chat mutation
@@ -87,7 +66,7 @@ export function useChat(options: ChatOptions = {}) {
       try {
         resetStreamedText()
 
-        const openai = getOpenAIClient()
+        const openai = getClient()
         const messages: OpenAI.Chat.ChatCompletionMessageParam[] = []
 
         // Add system message if provided
