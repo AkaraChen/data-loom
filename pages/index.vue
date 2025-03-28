@@ -35,8 +35,9 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+import { useEditorModel, type DocumentFile } from '~/composables/use-editor-model'
 
 definePageMeta({
   layout: 'default',
@@ -46,24 +47,42 @@ const taskDescription = ref('')
 const requirements = ref('')
 
 // 初始化文件列表
-const files = ref([
-  { id: 'file-1', name: 'a.txt', content: '' },
-  { id: 'file-2', name: 'b.txt', content: '' },
-  { id: 'file-3', name: 'c.txt', content: '' }
-])
+const initialFiles: DocumentFile[] = [
+  {
+    id: 'file-1',
+    name: '示例文档.txt',
+    content: '这是一个示例文档，你可以在这里编辑内容。'
+  }
+]
 
-// 当前活动文件ID
-const activeFileId = ref('file-1')
+// 使用编辑器模型
+const editorModel = useEditorModel({
+  initialFiles,
+  initialActiveFileId: 'file-1',
+  fileNamePrefix: '文档'
+})
 
-// 活动文件内容
-const activeFileContent = ref('')
+// 暴露给组件的状态
+const files = ref(editorModel.files.value)
+const activeFileId = ref(editorModel.activeFileId.value)
+const activeFileContent = ref(editorModel.activeFileContent.value)
+
+// 同步编辑器模型状态变化
+watch(() => editorModel.files.value, (newFiles) => {
+  files.value = newFiles
+})
+
+watch(() => editorModel.activeFileId.value, (newId) => {
+  activeFileId.value = newId
+})
+
+watch(() => editorModel.activeFileContent.value, (newContent) => {
+  activeFileContent.value = newContent
+})
 
 // 处理文档
-const processDocument = () => {
-  const activeFile = files.value.find(file => file.id === activeFileId.value)
-  if (activeFile) {
-    console.log('处理文档:', activeFile)
-    // 这里可以添加处理逻辑
-  }
+const processDocument = (file: DocumentFile) => {
+  console.log('处理文档:', file)
+  // 这里可以添加文档处理逻辑
 }
 </script>

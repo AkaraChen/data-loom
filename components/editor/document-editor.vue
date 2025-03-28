@@ -7,7 +7,7 @@
           <Icon name="mdi:folder-outline" size="20" class="text-primary" />
           文档列表
         </h2>
-        <button class="btn btn-ghost btn-sm btn-circle" @click="addNewFile">
+        <button class="btn btn-ghost btn-sm btn-circle" @click="editorModel.addNewFile">
           <Icon name="mdi:plus" size="16" />
         </button>
       </div>
@@ -37,7 +37,7 @@
             <span>{{ activeFile.name }}</span>
             <button 
               class="btn btn-ghost btn-xs btn-circle"
-              @click="closeFile"
+              @click="editorModel.closeFile"
             >
               <Icon name="mdi:close" size="12" />
             </button>
@@ -51,7 +51,8 @@
           v-if="activeFile"
           class="textarea !border-transparent !outline-none w-full h-full"
           placeholder="Enter content..."
-          v-model="activeFileContent"
+          :value="activeFileContent"
+          @input="(e) => editorModel.updateFileContent((e.target as HTMLTextAreaElement).value)"
         ></textarea>
         <div v-else class="flex items-center justify-center h-full text-base-content/50">
           <p>选择或创建一个文件开始编辑</p>
@@ -65,7 +66,7 @@
         <button 
           class="btn btn-sm btn-primary gap-1"
           :disabled="!activeFile"
-          @click="processFile"
+          @click="handleProcessFile"
         >
           <Icon name="mdi:play" size="16" />
           处理
@@ -77,73 +78,64 @@
 
 <script setup lang="ts">
 import { computed, watch } from 'vue'
-
-// 定义接口
-interface DocumentFile {
-  id: string
-  name: string
-  content: string
-}
+import { useEditorModel, type DocumentFile } from '~/composables/use-editor-model'
 
 // 定义事件
 const emit = defineEmits(['process'])
 
 // 使用 defineModel 暴露接口
-const files = defineModel<DocumentFile[]>('files')
-const activeFileId = defineModel<string | null>('activeFileId')
-
-// 计算当前活动文件
-const activeFile = computed(() => {
-  return files.value!.find(file => file.id === activeFileId.value) || null
-})
-
-// 为活动文件内容创建一个单独的 model
+const files = defineModel<DocumentFile[]>('files', { default: () => [] })
+const activeFileId = defineModel<string | null>('activeFileId', { default: null })
 const activeFileContent = defineModel<string>('activeFileContent', { default: '' })
 
-// 监听活动文件变化，更新内容
-watch(activeFile, (newFile) => {
-  activeFileContent.value = newFile?.content || ''
+// 使用编辑器模型
+const editorModel = useEditorModel({
+  initialFiles: files.value,
+  initialActiveFileId: activeFileId.value,
+  fileNamePrefix: '新文件'
+})
+
+// 计算当前活动文件 - 用于模板中访问
+const activeFile = computed(() => editorModel.activeFile.value)
+
+// 同步模型和组件状态
+watch(() => editorModel.files.value, (newFiles) => {
+  files.value = newFiles
 }, { immediate: true })
 
-// 监听内容变化，更新文件
-watch(activeFileContent, (newContent) => {
-  if (activeFile.value) {
-    const updatedFiles = files.value!.map(file => {
-      if (file.id === activeFileId.value) {
-        return { ...file, content: newContent }
-      }
-      return file
-    })
-    files.value = updatedFiles
+watch(() => editorModel.activeFileId.value, (newActiveFileId) => {
+  activeFileId.value = newActiveFileId
+}, { immediate: true })
+
+watch(() => editorModel.activeFileContent.value, (newContent) => {
+  activeFileContent.value = newContent
+}, { immediate: true })
+
+// 同步组件状态到模型
+watch(() => files.value, (newFiles) => {
+  if (newFiles && JSON.stringify(newFiles) !== JSON.stringify(editorModel.files.value)) {
+    editorModel.files.value = newFiles
+  }
+}, { deep: true })
+
+watch(() => activeFileId.value, (newActiveFileId) => {
+  if (newActiveFileId !== editorModel.activeFileId.value) {
+    editorModel.activeFileId.value = newActiveFileId
   }
 })
 
-// 添加新文件
-const addNewFile = () => {
-  const newId = `file-${Date.now()}`
-  const newFile = {
-    id: newId,
-    name: `新文件-${files.value!.length + 1}.txt`,
-    content: ''
+watch(() => activeFileContent.value, (newContent) => {
+  if (newContent !== editorModel.activeFileContent.value) {
+    editorModel.updateFileContent(newContent)
   }
-  files.value = [...files.value!, newFile]
-  activeFileId.value = newId
-}
-
-// 关闭文件
-const closeFile = () => {
-  if (files.value!.length > 0) {
-    activeFileId.value = files.value![0].id
-  } else {
-    activeFileId.value = null
-  }
-}
+})
 
 // 处理文件
-const processFile = () => {
-  // 这里可以添加文件处理逻辑
-  console.log('处理文件:', activeFile.value)
-  emit('process', activeFile.value)
+const handleProcessFile = () => {
+  const file = editorModel.processFile()
+  if (file) {
+    emit('process', file)
+  }
 }
 </script>
 
