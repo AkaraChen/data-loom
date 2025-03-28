@@ -1,0 +1,122 @@
+<template>
+  <div class="flex-1 flex flex-col">
+    <!-- Editor Tabs -->
+    <div class="flex bg-base-100 border-b border-base-content/10">
+      <div class="flex-1 flex overflow-x-auto">
+        <div
+          v-if="activeFile"
+          class="px-3 py-2 flex items-center gap-2 bg-base-100 border-r border-base-content/10"
+        >
+          <Icon name="mdi:file-outline" size="16" class="text-primary" />
+          <span>{{ activeFile.name }}</span>
+          <button
+            class="btn btn-ghost btn-xs btn-circle"
+            @click="$emit('close-file')"
+          >
+            <Icon name="mdi:close" size="12" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editor Content -->
+    <div class="flex-1 overflow-auto bg-base-100 p-0.5 text-sm">
+      <EditorPreview
+        v-if="isPreviewMode && activeFile"
+        v-model="modelValue"
+        :fileType="getFileExtension(activeFile?.name || '')"
+        :isStreaming="disabled"
+      />
+      <MonacoEditor
+        v-else-if="activeFile"
+        v-model="modelValue"
+        :lang="getFileExtension(activeFile?.name || '')"
+        class="w-full h-full"
+        :options="{
+          minimap: { enabled: false },
+          unicodeHighlight: {
+            nonBasicASCII: false,
+            ambiguousCharacters: false,
+          },
+          fontFamily: 'Space Mono, Noto Sans SC, monospace',
+        }"
+      />
+      <div
+        v-else
+        class="flex items-center justify-center h-full text-base-content/50"
+      >
+        <p>选择或创建一个文件开始编辑</p>
+      </div>
+    </div>
+
+    <!-- Editor Actions -->
+    <div
+      class="flex justify-between p-2 bg-base-100 border-t border-base-content/10"
+    >
+      <div class="flex items-center">
+        <button
+          class="btn btn-sm btn-ghost gap-1"
+          @click="$emit('toggle-preview')"
+          :class="{ 'btn-active': isPreviewMode }"
+        >
+          <Icon :name="isPreviewMode ? 'mdi:eye' : 'mdi:code-tags'" size="16" />
+          {{ isPreviewMode ? '预览' : '源码' }}
+        </button>
+      </div>
+      <button
+        class="btn btn-sm btn-primary gap-1"
+        :disabled="!activeFile || disabled"
+        @click="$emit('process-file')"
+      >
+        <Icon name="mdi:play" size="16" />
+        处理
+      </button>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+import EditorPreview from './preview/index.vue'
+
+// 文档文件接口
+interface DocumentFile {
+  id: string
+  name: string
+  content: string
+}
+
+// 定义属性
+const props = defineProps<{
+  files: DocumentFile[]
+  activeFileId: string | null
+  isPreviewMode: boolean
+  disabled: boolean
+}>()
+
+// 使用 defineModel 处理 v-model
+const modelValue = defineModel<string>('modelValue')
+
+// 定义事件
+defineEmits(['toggle-preview', 'process-file', 'close-file'])
+
+// 计算当前活动文件
+const activeFile = computed(() => {
+  if (!props.activeFileId) return null
+  return props.files.find(file => file.id === props.activeFileId) || null
+})
+
+// 获取文件扩展名
+const getFileExtension = (fileName: string): string => {
+  const lastDotIndex = fileName.lastIndexOf('.')
+  if (lastDotIndex === -1) return 'txt'
+  return fileName.substring(lastDotIndex + 1).toLowerCase()
+}
+</script>
+
+<style scoped>
+/* 用于触发 nuxt font */
+.not-exist-class {
+  font-family: 'Space Mono', monospace;
+}
+</style>
