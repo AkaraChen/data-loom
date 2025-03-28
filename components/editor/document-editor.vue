@@ -2,10 +2,10 @@
   <div class="flex-1 flex">
     <!-- File Explorer (Left Side) -->
     <div
-      class="w-64 bg-base-100 border-r border-base-300 p-4 flex flex-col h-full"
+      class="w-64 bg-base-100 border-r border-base-300 flex flex-col h-full"
     >
       <!-- Document List Section - Max 2/3 height -->
-      <div class="flex flex-col h-full max-h-[66%] min-h-[200px]">
+      <div class="flex flex-col h-full max-h-[66%] min-h-[200px] p-4">
         <div class="flex items-center justify-between mb-2">
           <h2 class="font-medium flex items-center gap-2">
             <Icon name="mdi:folder-outline" size="20" class="text-primary" />
@@ -41,9 +41,9 @@
       <!-- Context Files Section - Max 1/3 height -->
       <div
         v-if="contextFiles.length > 0"
-        class="mt-4 flex-1 max-h-[33%] flex flex-col"
+        class="mt-0 flex-1 max-h-[33%] flex flex-col border-t border-base-300"
       >
-        <div class="mb-2">
+        <div class="p-4">
           <h3 class="font-medium flex items-center gap-2">
             <Icon name="mdi:link-variant" size="16" class="text-primary" />
             上下文文件
@@ -52,7 +52,7 @@
             已选择 {{ contextFiles.length }} 个文件作为上下文
           </div>
         </div>
-        <div class="overflow-y-auto flex-1">
+        <div class="overflow-y-auto flex-1 px-4 pb-4">
           <ul class="menu menu-compact w-full p-0 bg-base-200 rounded-box">
             <li
               v-for="file in contextFiles"
