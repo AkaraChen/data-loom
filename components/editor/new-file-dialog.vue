@@ -22,7 +22,11 @@
       <fieldset class="fieldset">
         <legend class="fieldset-legend">文件类型</legend>
         <select class="select w-full" v-model="selectedFileType">
-          <option v-for="option in fileTypeOptions" :key="option.value" :value="option.value">
+          <option
+            v-for="option in fileTypeOptions"
+            :key="option.value"
+            :value="option.value"
+          >
             {{ option.label }}
           </option>
         </select>
@@ -64,7 +68,9 @@ const fileTypeOptions = [
 
 // 获取当前选择的文件类型扩展名
 const getSelectedExtension = (): string => {
-  const option = fileTypeOptions.find(opt => opt.value === selectedFileType.value)
+  const option = fileTypeOptions.find(
+    opt => opt.value === selectedFileType.value,
+  )
   return option ? option.extension : '.md'
 }
 
@@ -75,11 +81,11 @@ const createFile = () => {
     // 否则添加所选文件类型的扩展名
     let finalFileName = fileName.value.trim()
     const hasExtension = /\.\w+$/.test(finalFileName)
-    
+
     if (!hasExtension) {
       finalFileName += getSelectedExtension()
     }
-    
+
     emit('create', finalFileName, selectedFileType.value)
     fileName.value = ''
     // 关闭对话框

@@ -12,9 +12,9 @@
       }"
     >
       <div class="flex items-center gap-2">
-        <input 
-          type="checkbox" 
-          class="checkbox checkbox-xs checkbox-primary" 
+        <input
+          type="checkbox"
+          class="checkbox checkbox-xs checkbox-primary"
           :checked="checked"
           @change="updateChecked($event)"
           @click.stop
@@ -33,15 +33,24 @@
           class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
           @click.stop="isOpen = false"
         >
-          <li @click="$emit('rename')"><a>
-            <Icon name="mdi:rename" size="16" />
-            重命名</a></li>
-          <li @click="$emit('duplicate')"><a>
-            <Icon name="mdi:content-copy" size="16" />
-            复制</a></li>
-          <li @click="$emit('delete')"><a class="text-error">
-            <Icon name="mdi:delete" size="16" />
-            删除</a></li>
+          <li @click="$emit('rename')">
+            <a>
+              <Icon name="mdi:rename" size="16" />
+              重命名</a
+            >
+          </li>
+          <li @click="$emit('duplicate')">
+            <a>
+              <Icon name="mdi:content-copy" size="16" />
+              复制</a
+            >
+          </li>
+          <li @click="$emit('delete')">
+            <a class="text-error">
+              <Icon name="mdi:delete" size="16" />
+              删除</a
+            >
+          </li>
         </ul>
       </details>
     </a>

@@ -47,8 +47,8 @@ export const useWorkspaceStore = defineStore(
     )
 
     // 计算属性：上下文文件列表
-    const contextFiles = computed(() => 
-      files.value.filter(file => contextFileIds.value.includes(file.id))
+    const contextFiles = computed(() =>
+      files.value.filter(file => contextFileIds.value.includes(file.id)),
     )
 
     // 计算属性：根据当前活动文件自动计算输出模式
@@ -158,7 +158,7 @@ export const useWorkspaceStore = defineStore(
       // 添加上下文文件内容
       if (contextFiles.value.length > 0) {
         prompt += `上下文文件:\n\n`
-        
+
         contextFiles.value.forEach(file => {
           prompt += `--- ${file.name} ---\n${file.content}\n\n`
         })

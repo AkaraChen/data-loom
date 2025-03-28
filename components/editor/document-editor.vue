@@ -41,7 +41,11 @@
           已选择 {{ contextFiles.length }} 个文件作为上下文
         </div>
         <ul class="menu menu-compact w-full p-0 bg-base-200 rounded-box">
-          <li v-for="file in contextFiles" :key="file.id" class="text-xs py-1 px-2">
+          <li
+            v-for="file in contextFiles"
+            :key="file.id"
+            class="text-xs py-1 px-2"
+          >
             {{ file.name }}
           </li>
         </ul>
@@ -132,43 +136,57 @@ const activeFileId = defineModel<string | null>('activeFileId', {
 const activeFileContent = defineModel<string>('activeFileContent', {
   default: '',
 })
-const contextFileIds = defineModel<string[]>('contextFileIds', { default: () => [] })
+const contextFileIds = defineModel<string[]>('contextFileIds', {
+  default: () => [],
+})
 
 // 文件上下文映射表，用于跟踪每个文件的选中状态
 const fileContextMap = reactive<Record<string, boolean>>({})
 
 // 监听文件列表变化，更新映射表
-watch(files, newFiles => {
-  // 添加新文件到映射表
-  newFiles.forEach(file => {
-    if (fileContextMap[file.id] === undefined) {
-      fileContextMap[file.id] = contextFileIds.value.includes(file.id)
-    }
-  })
-  
-  // 移除不存在的文件
-  Object.keys(fileContextMap).forEach(fileId => {
-    if (!newFiles.some(file => file.id === fileId)) {
-      delete fileContextMap[fileId]
-    }
-  })
-}, { immediate: true, deep: true })
+watch(
+  files,
+  newFiles => {
+    // 添加新文件到映射表
+    newFiles.forEach(file => {
+      if (fileContextMap[file.id] === undefined) {
+        fileContextMap[file.id] = contextFileIds.value.includes(file.id)
+      }
+    })
+
+    // 移除不存在的文件
+    Object.keys(fileContextMap).forEach(fileId => {
+      if (!newFiles.some(file => file.id === fileId)) {
+        delete fileContextMap[fileId]
+      }
+    })
+  },
+  { immediate: true, deep: true },
+)
 
 // 监听映射表变化，更新上下文文件ID数组
-watch(fileContextMap, newMap => {
-  const selectedIds = Object.entries(newMap)
-    .filter(([_, checked]) => checked)
-    .map(([id]) => id)
-  
-  contextFileIds.value = selectedIds
-}, { deep: true })
+watch(
+  fileContextMap,
+  newMap => {
+    const selectedIds = Object.entries(newMap)
+      .filter(([_, checked]) => checked)
+      .map(([id]) => id)
+
+    contextFileIds.value = selectedIds
+  },
+  { deep: true },
+)
 
 // 监听上下文文件ID数组变化，更新映射表
-watch(contextFileIds, newIds => {
-  files.value.forEach(file => {
-    fileContextMap[file.id] = newIds.includes(file.id)
-  })
-}, { deep: true })
+watch(
+  contextFileIds,
+  newIds => {
+    files.value.forEach(file => {
+      fileContextMap[file.id] = newIds.includes(file.id)
+    })
+  },
+  { deep: true },
+)
 
 // 计算当前上下文文件列表
 const contextFiles = computed(() => {
@@ -270,12 +288,12 @@ const handleDeleteFile = (fileId: string) => {
 
   // 从文件列表中移除
   files.value = files.value.filter(file => file.id !== fileId)
-  
+
   // 从上下文文件ID数组中移除
   if (contextFileIds.value.includes(fileId)) {
     contextFileIds.value = contextFileIds.value.filter(id => id !== fileId)
   }
-  
+
   // 从映射表中移除
   delete fileContextMap[fileId]
 }
@@ -310,14 +328,14 @@ const handleDuplicateFile = (fileId: string) => {
   let baseName = file.name
   const lastDotIndex = baseName.lastIndexOf('.')
   let extension = ''
-  
+
   if (lastDotIndex !== -1) {
     extension = baseName.substring(lastDotIndex)
     baseName = baseName.substring(0, lastDotIndex)
   }
-  
+
   const newName = `${baseName} 副本${extension}`
-  
+
   // 创建新文件
   const newId = `file-${Date.now()}`
   const newFile: DocumentFile = {
@@ -325,10 +343,10 @@ const handleDuplicateFile = (fileId: string) => {
     name: newName,
     content: file.content,
   }
-  
+
   files.value = [...files.value, newFile]
   fileContextMap[newId] = false // 初始化新文件的上下文状态
-  
+
   // 只有在非阻塞状态下才更新活动文件ID
   if (!props.blocking) {
     activeFileId.value = newId
