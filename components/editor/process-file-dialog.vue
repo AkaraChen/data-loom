@@ -6,26 +6,26 @@
   >
     <div class="modal-box">
       <h3 class="font-bold text-lg mb-4">处理文件</h3>
-      
+
       <div class="mb-4">
-        <p class="text-base-content/80 mb-2">
+        <p class="text-base-content/80 mb-2 text-sm">
           当前文件: <span class="font-medium">{{ fileName }}</span>
         </p>
       </div>
-      
+
       <!-- Custom Processing Form -->
       <div class="form-control mb-4 flex flex-col">
-        <textarea 
-          class="textarea textarea-bordered h-24 w-full" 
-          placeholder="请输入处理要求..." 
+        <textarea
+          class="textarea textarea-bordered h-24 w-full"
+          placeholder="请输入处理要求..."
           v-model="customPrompt"
         ></textarea>
       </div>
 
       <div class="modal-action">
         <form method="dialog">
-          <button 
-            class="btn btn-primary" 
+          <button
+            class="btn btn-primary"
             @click="submitCustomProcess"
             :disabled="!customPrompt.trim()"
           >

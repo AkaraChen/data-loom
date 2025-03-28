@@ -1,9 +1,7 @@
 <template>
   <div class="flex-1 flex">
     <!-- File Explorer (Left Side) -->
-    <div
-      class="w-64 bg-base-100 border-r border-base-300 flex flex-col h-full"
-    >
+    <div class="w-64 bg-base-100 border-r border-base-300 flex flex-col h-full">
       <!-- Document List Section - Max 2/3 height -->
       <div class="flex flex-col h-full max-h-[66%] min-h-[200px] p-4">
         <div class="flex items-center justify-between mb-2">
@@ -145,12 +143,15 @@
 
   <!-- 新建文件对话框 -->
   <EditorNewFileDialog ref="newFileDialog" @create="createNewFile" />
-  
+
   <!-- 重命名文件对话框 -->
   <EditorRenameFileDialog ref="renameFileDialog" @rename="confirmRenameFile" />
-  
+
   <!-- 处理文件对话框 -->
-  <EditorProcessFileDialog ref="processFileDialog" @process="handleProcessAction" />
+  <EditorProcessFileDialog
+    ref="processFileDialog"
+    @process="handleProcessAction"
+  />
 </template>
 
 <script setup lang="ts">
@@ -369,7 +370,7 @@ const handleRenameFile = (fileId: string) => {
 
   // 保存当前正在重命名的文件ID
   renamingFileId.value = fileId
-  
+
   // 打开重命名对话框
   renameFileDialog.value?.open(file.name)
 }
@@ -377,7 +378,7 @@ const handleRenameFile = (fileId: string) => {
 // 确认重命名文件
 const confirmRenameFile = (newFileName: string) => {
   if (!renamingFileId.value) return
-  
+
   // 更新文件名
   const fileIndex = files.value.findIndex(f => f.id === renamingFileId.value)
   if (fileIndex !== -1) {
@@ -388,7 +389,7 @@ const confirmRenameFile = (newFileName: string) => {
     }
     files.value = updatedFiles
   }
-  
+
   // 重置重命名文件ID
   renamingFileId.value = null
 }
