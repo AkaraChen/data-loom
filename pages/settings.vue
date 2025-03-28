@@ -67,25 +67,6 @@
         </settings-item>
       </settings-section>
     </div>
-    
-    <!-- Save Button -->
-    <div class="mt-4 flex justify-end">
-      <button 
-        @click="saveSettings" 
-        class="btn btn-primary btn-sm gap-1"
-      >
-        <Icon name="mdi:content-save" size="16" />
-        保存设置
-      </button>
-    </div>
-    
-    <!-- Notification -->
-    <div v-if="showNotification" class="toast toast-end">
-      <div class="alert alert-success py-2 px-4 min-h-0">
-        <Icon name="mdi:check-circle" size="16" />
-        <span class="text-sm">设置已保存</span>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -95,21 +76,10 @@ import { useSettingsStore } from '~/stores/settings';
 
 const settingsStore = useSettingsStore();
 const showApiKey = ref(false);
-const showNotification = ref(false);
 
 // 切换 API Key 可见性
 const toggleApiKeyVisibility = () => 
   showApiKey.value = !showApiKey.value;
-
-// 保存设置
-const saveSettings = () => {
-  // 由于使用了 Pinia 的持久化插件，设置会自动保存
-  // 这里只需显示通知
-  showNotification.value = true;
-  setTimeout(() => {
-    showNotification.value = false;
-  }, 3000);
-};
 
 definePageMeta({
   layout: 'default'
