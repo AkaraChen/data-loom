@@ -1,5 +1,5 @@
 <template>
-  <li class="w-full">
+  <li class="w-full" ref="liRef">
     <a
       class="w-full flex justify-start"
       :class="{
@@ -10,15 +10,18 @@
     >
       <Icon name="mdi:file-outline" size="16" />
       {{ fileName }}
-      <details class="dropdown ml-auto">
-        <summary class="btn btn-ghost btn-square btn-xs">
-          <Icon name="mdi:more-vert" size="16"/>
+      <details class="dropdown ml-auto" ref="detailsRef" :open="isOpen">
+        <summary class="btn btn-ghost btn-square btn-xs" @click.stop>
+          <Icon name="mdi:more-vert" size="16" />
         </summary>
         <ul
           class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
         >
-          <li><a>Item 1</a></li>
-          <li><a>Item 2</a></li>
+          <li><a @click.stop="$emit('rename')">Rename</a></li>
+          <li><a @click.stop="$emit('duplicate')">Duplicate</a></li>
+          <li>
+            <a @click.stop="$emit('delete')" class="text-error">Delete</a>
+          </li>
         </ul>
       </details>
     </a>
@@ -41,5 +44,50 @@ defineProps({
   },
 })
 
-defineEmits(['click'])
+const emit = defineEmits(['click', 'rename', 'duplicate', 'delete'])
+
+const liRef = ref<HTMLElement | null>(null)
+const detailsRef = ref<HTMLDetailsElement | null>(null)
+const isOpen = ref(false)
+
+// Handle click outside to close the dropdown
+function handleClickOutside(event: MouseEvent) {
+  if (detailsRef.value && !detailsRef.value.contains(event.target as Node)) {
+    isOpen.value = false
+  }
+}
+
+// Watch for details open state changes
+watch(isOpen, newValue => {
+  if (newValue) {
+    // Add click event listener when dropdown opens
+    nextTick(() => {
+      document.addEventListener('click', handleClickOutside)
+    })
+  } else {
+    // Remove click event listener when dropdown closes
+    document.removeEventListener('click', handleClickOutside)
+  }
+})
+
+// Watch the actual details element's open attribute
+onMounted(() => {
+  if (detailsRef.value) {
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        if (mutation.attributeName === 'open') {
+          isOpen.value = detailsRef.value?.hasAttribute('open') || false
+        }
+      })
+    })
+
+    observer.observe(detailsRef.value, { attributes: true })
+
+    // Clean up observer on unmount
+    onUnmounted(() => {
+      observer.disconnect()
+      document.removeEventListener('click', handleClickOutside)
+    })
+  }
+})
 </script>
