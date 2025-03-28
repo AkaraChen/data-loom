@@ -35,6 +35,9 @@
         </form>
       </div>
     </div>
+    <form method="dialog" class="modal-backdrop">
+      <button>关闭</button>
+    </form>
   </dialog>
 </template>
 
