@@ -43,13 +43,13 @@
 import { ref } from 'vue'
 import EditorFileExplorer from './file-explorer.vue'
 import EditorArea from './editor-area.vue'
-
-// 文档文件接口
-interface DocumentFile {
-  id: string
-  name: string
-  content: string
-}
+import {
+  type DocumentFile,
+  createFileObject,
+  createDuplicateFileName,
+  findFile,
+  findFileIndex,
+} from '~/utils/file'
 
 // 定义属性
 const props = defineProps({
@@ -105,28 +105,14 @@ const showNewFileDialog = () => {
 
 // 创建新文件
 const createNewFile = (fileName: string) => {
-  const newId = `file-${Date.now()}`
-  let initialContent = ''
-
-  // 为特定文件类型设置默认内容
-  const fileExt = getFileExtension(fileName)
-  if (fileExt === 'json') {
-    initialContent = '{}'
-  }
-
-  const newFile: DocumentFile = {
-    id: newId,
-    name: fileName,
-    content: initialContent,
-  }
-
+  const newFile = createFileObject(fileName)
   files.value = [...files.value, newFile]
 
   // 只有在非阻塞状态下才更新活动文件ID
   if (!props.blocking) {
-    activeFileId.value = newId
+    activeFileId.value = newFile.id
   } else {
-    emit('fileSelectBlocked', newId)
+    emit('fileSelectBlocked', newFile.id)
   }
 }
 
@@ -135,27 +121,9 @@ const closeFile = () => {
   activeFileId.value = null
 }
 
-// 更新文件内容
-const updateFileContent = (content: string) => {
-  activeFileContent.value = content
-
-  // 更新文件内容
-  if (activeFileId.value) {
-    const fileIndex = files.value.findIndex(f => f.id === activeFileId.value)
-    if (fileIndex !== -1) {
-      const updatedFiles = [...files.value]
-      updatedFiles[fileIndex] = {
-        ...updatedFiles[fileIndex],
-        content,
-      }
-      files.value = updatedFiles
-    }
-  }
-}
-
 // 处理文件
 const handleProcessFile = () => {
-  const file = files.value.find(f => f.id === activeFileId.value)
+  const file = findFile(files.value, activeFileId.value || '')
   if (file) {
     // 打开处理文件对话框
     processFileDialog.value?.open(file.name)
@@ -164,7 +132,7 @@ const handleProcessFile = () => {
 
 // 处理文件动作
 const handleProcessAction = (action: string) => {
-  const file = files.value.find(f => f.id === activeFileId.value)
+  const file = findFile(files.value, activeFileId.value || '')
   if (file) {
     // 将处理动作和文件一起发送给父组件
     emit('process', { file, action })
@@ -189,7 +157,7 @@ const handleDeleteFile = (fileId: string) => {
 
 // 重命名文件
 const handleRenameFile = (fileId: string) => {
-  const file = files.value.find(f => f.id === fileId)
+  const file = findFile(files.value, fileId)
   if (!file) return
 
   // 保存当前正在重命名的文件ID
@@ -204,7 +172,7 @@ const confirmRenameFile = (newFileName: string) => {
   if (!renamingFileId.value) return
 
   // 更新文件名
-  const fileIndex = files.value.findIndex(f => f.id === renamingFileId.value)
+  const fileIndex = findFileIndex(files.value, renamingFileId.value)
   if (fileIndex !== -1) {
     const updatedFiles = [...files.value]
     updatedFiles[fileIndex] = {
@@ -220,20 +188,11 @@ const confirmRenameFile = (newFileName: string) => {
 
 // 复制文件
 const handleDuplicateFile = (fileId: string) => {
-  const file = files.value.find(f => f.id === fileId)
+  const file = findFile(files.value, fileId)
   if (!file) return
 
   // 创建新文件名 (添加 "副本" 后缀)
-  let baseName = file.name
-  const lastDotIndex = baseName.lastIndexOf('.')
-  let extension = ''
-
-  if (lastDotIndex !== -1) {
-    extension = baseName.substring(lastDotIndex)
-    baseName = baseName.substring(0, lastDotIndex)
-  }
-
-  const newName = `${baseName} 副本${extension}`
+  const newName = createDuplicateFileName(file.name)
 
   // 创建新文件
   const newId = `file-${Date.now()}`
@@ -259,12 +218,5 @@ const isPreviewMode = ref(false)
 // 切换预览模式
 const togglePreviewMode = () => {
   isPreviewMode.value = !isPreviewMode.value
-}
-
-// 获取文件扩展名
-const getFileExtension = (fileName: string): string => {
-  const lastDotIndex = fileName.lastIndexOf('.')
-  if (lastDotIndex === -1) return 'txt'
-  return fileName.substring(lastDotIndex + 1).toLowerCase()
 }
 </script>
