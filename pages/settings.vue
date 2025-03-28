@@ -7,8 +7,8 @@
     
     <div class="grid grid-cols-1 gap-6">
       <!-- API Settings Section -->
-      <SettingsSection title="API 设置" icon="mdi:api">
-        <SettingsItem 
+      <settings-section title="API 设置" icon="mdi:api">
+        <settings-item 
           title="模型供应商" 
           description="选择你想要使用的 AI 模型供应商"
         >
@@ -18,9 +18,9 @@
             <option value="google">Google</option>
             <option value="claude">Claude</option>
           </select>
-        </SettingsItem>
+        </settings-item>
         
-        <SettingsItem 
+        <settings-item 
           title="API Key" 
           description="输入你的 API Key 以访问所选供应商的服务"
         >
@@ -38,9 +38,9 @@
               <Icon :name="showApiKey ? 'mdi:eye-off' : 'mdi:eye'" size="20" />
             </button>
           </div>
-        </SettingsItem>
+        </settings-item>
         
-        <SettingsItem 
+        <settings-item 
           title="API Endpoint" 
           description="可选：自定义 API 端点，如果你需要使用非默认服务器"
         >
@@ -50,12 +50,12 @@
             placeholder="输入 API Endpoint（可选）" 
             class="input input-bordered w-full" 
           />
-        </SettingsItem>
-      </SettingsSection>
+        </settings-item>
+      </settings-section>
       
       <!-- UI Settings Section (Example) -->
-      <SettingsSection title="界面设置" icon="mdi:palette">
-        <SettingsItem 
+      <settings-section title="界面设置" icon="mdi:palette">
+        <settings-item 
           title="主题" 
           description="选择应用的显示主题"
         >
@@ -64,8 +64,8 @@
             <option value="dark">深色</option>
             <option value="system">跟随系统</option>
           </select>
-        </SettingsItem>
-      </SettingsSection>
+        </settings-item>
+      </settings-section>
     </div>
     
     <!-- Save Button -->
@@ -91,8 +91,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import SettingsItem from '~/components/SettingsItem.vue';
-import SettingsSection from '~/components/SettingsSection.vue';
+import SettingsItem from '~/components/settings-item.vue';
+import SettingsSection from '~/components/settings-section.vue';
 
 const settings = ref({
   provider: '',
@@ -139,5 +139,5 @@ onMounted(() => {
 
 definePageMeta({
   layout: 'default'
-})
+});
 </script>
