@@ -24,6 +24,9 @@
           :isActive="activeFileId === file.id"
           :disabled="blocking"
           @click="handleFileSelect(file.id)"
+          @delete="handleDeleteFile(file.id)"
+          @rename="handleRenameFile(file.id)"
+          @duplicate="handleDuplicateFile(file.id)"
         />
       </ul>
     </div>
@@ -41,7 +44,7 @@
             <span>{{ activeFile.name }}</span>
             <button
               class="btn btn-ghost btn-xs btn-circle"
-              @click="editorModel.closeFile"
+              @click="closeFile"
             >
               <Icon name="mdi:close" size="12" />
             </button>
@@ -56,12 +59,7 @@
           class="textarea !border-transparent !outline-none w-full h-full"
           placeholder="Enter content..."
           :value="activeFileContent"
-          @input="
-            e =>
-              editorModel.updateFileContent(
-                (e.target as HTMLTextAreaElement).value,
-              )
-          "
+          @input="updateFileContent($event)"
         ></textarea>
         <div
           v-else
@@ -93,10 +91,13 @@
 
 <script setup lang="ts">
 import { computed, watch, ref } from 'vue'
-import {
-  useEditorModel,
-  type DocumentFile,
-} from '~/composables/use-editor-model'
+
+// 文档文件接口
+interface DocumentFile {
+  id: string
+  name: string
+  content: string
+}
 
 // 定义属性
 const props = defineProps({
@@ -120,6 +121,21 @@ const activeFileContent = defineModel<string>('activeFileContent', {
 
 // 新建文件对话框引用
 const newFileDialog = ref<{ open: () => void } | null>(null)
+
+// 计算当前活动文件
+const activeFile = computed(() => {
+  if (!activeFileId.value) return null
+  return files.value.find(file => file.id === activeFileId.value) || null
+})
+
+// 监听活动文件变化，更新内容
+watch(activeFile, newActiveFile => {
+  if (newActiveFile) {
+    activeFileContent.value = newActiveFile.content
+  } else {
+    activeFileContent.value = ''
+  }
+})
 
 // 处理文件选择
 const handleFileSelect = (fileId: string) => {
@@ -157,81 +173,81 @@ const createNewFile = (fileName: string) => {
   }
 }
 
-// 使用编辑器模型
-const editorModel = useEditorModel({
-  initialFiles: files.value,
-  initialActiveFileId: activeFileId.value,
-  fileNamePrefix: '新文件',
-})
+// 关闭文件
+const closeFile = () => {
+  activeFileId.value = null
+}
 
-// 计算当前活动文件 - 用于模板中访问
-const activeFile = computed(() => editorModel.activeFile.value)
-
-// 同步模型和组件状态
-watch(
-  () => editorModel.files.value,
-  newFiles => {
-    files.value = newFiles
-  },
-  { immediate: true },
-)
-
-watch(
-  () => editorModel.activeFileId.value,
-  newActiveFileId => {
-    // 只有在非阻塞状态下才更新活动文件ID
-    if (!props.blocking) {
-      activeFileId.value = newActiveFileId
+// 更新文件内容
+const updateFileContent = (event: Event) => {
+  const content = (event.target as HTMLTextAreaElement).value
+  activeFileContent.value = content
+  
+  // 更新文件内容
+  if (activeFile.value) {
+    const fileIndex = files.value.findIndex(f => f.id === activeFileId.value)
+    if (fileIndex !== -1) {
+      const updatedFiles = [...files.value]
+      updatedFiles[fileIndex] = {
+        ...updatedFiles[fileIndex],
+        content
+      }
+      files.value = updatedFiles
     }
-  },
-  { immediate: true },
-)
-
-watch(
-  () => editorModel.activeFileContent.value,
-  newContent => {
-    activeFileContent.value = newContent
-  },
-  { immediate: true },
-)
-
-// 同步组件状态到模型
-watch(
-  () => files.value,
-  newFiles => {
-    if (
-      newFiles &&
-      JSON.stringify(newFiles) !== JSON.stringify(editorModel.files.value)
-    ) {
-      editorModel.files.value = newFiles
-    }
-  },
-  { deep: true },
-)
-
-watch(
-  () => activeFileId.value,
-  newActiveFileId => {
-    if (newActiveFileId !== editorModel.activeFileId.value) {
-      editorModel.activeFileId.value = newActiveFileId
-    }
-  },
-)
-
-watch(
-  () => activeFileContent.value,
-  newContent => {
-    if (newContent !== editorModel.activeFileContent.value) {
-      editorModel.updateFileContent(newContent)
-    }
-  },
-)
+  }
+}
 
 // 处理文件
 const handleProcessFile = () => {
-  const file = editorModel.processFile()
-  if (file) {
-    emit('process', file)
+  if (activeFile.value) {
+    emit('process', activeFile.value)
+  }
+}
+
+// 删除文件
+const handleDeleteFile = (fileId: string) => {
+  files.value = files.value.filter(file => file.id !== fileId)
+  if (activeFileId.value === fileId) {
+    activeFileId.value = null
+  }
+}
+
+// 重命名文件
+const handleRenameFile = (fileId: string) => {
+  const file = files.value.find(f => f.id === fileId)
+  if (!file) return
+  
+  const newName = prompt('输入新文件名', file.name)
+  if (newName && newName.trim()) {
+    const fileIndex = files.value.findIndex(f => f.id === fileId)
+    if (fileIndex !== -1) {
+      const updatedFiles = [...files.value]
+      updatedFiles[fileIndex] = {
+        ...updatedFiles[fileIndex],
+        name: newName.endsWith('.txt') ? newName : `${newName}.txt`
+      }
+      files.value = updatedFiles
+    }
+  }
+}
+
+// 复制文件
+const handleDuplicateFile = (fileId: string) => {
+  const file = files.value.find(f => f.id === fileId)
+  if (!file) return
+  
+  const newId = `file-${Date.now()}`
+  const newFile: DocumentFile = {
+    id: newId,
+    name: `${file.name.replace('.txt', '')} (复制).txt`,
+    content: file.content,
+  }
+  
+  files.value = [...files.value, newFile]
+  
+  // 只有在非阻塞状态下才更新活动文件ID
+  if (!props.blocking) {
+    activeFileId.value = newId
   }
 }
 </script>
@@ -240,20 +256,5 @@ const handleProcessFile = () => {
 /* 确保菜单项占满宽度 */
 :deep(.menu li a) {
   width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
-
-:deep(.menu li) {
-  width: 100%;
-}
-
-/* 确保紧凑菜单项占满宽度 */
-:deep(.menu-compact > li > a) {
-  width: 100% !important;
-  margin: 0;
-  border-radius: 0.25rem;
 }
 </style>
