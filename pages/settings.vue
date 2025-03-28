@@ -12,7 +12,7 @@
           title="模型供应商" 
           description="选择你想要使用的 AI 模型供应商"
         >
-          <select v-model="settings.provider" class="select select-bordered select-sm w-full">
+          <select v-model="settingsStore.provider" class="select select-bordered select-sm w-full">
             <option disabled value="">请选择供应商</option>
             <option value="openai">OpenAI</option>
             <option value="google">Google</option>
@@ -27,7 +27,7 @@
           <div class="flex">
             <input 
               :type="showApiKey ? 'text' : 'password'" 
-              v-model="settings.apiKey" 
+              v-model="settingsStore.apiKey" 
               placeholder="输入你的 API Key" 
               class="input input-bordered input-sm flex-1" 
             />
@@ -46,7 +46,7 @@
         >
           <input 
             type="text" 
-            v-model="settings.apiEndpoint" 
+            v-model="settingsStore.apiEndpoint" 
             placeholder="输入 API Endpoint（可选）" 
             class="input input-bordered input-sm w-full" 
           />
@@ -59,7 +59,7 @@
           title="主题" 
           description="选择应用的显示主题"
         >
-          <select v-model="settings.theme" class="select select-bordered select-sm w-full">
+          <select v-model="settingsStore.theme" class="select select-bordered select-sm w-full">
             <option value="light">浅色</option>
             <option value="dark">深色</option>
             <option value="system">跟随系统</option>
@@ -90,50 +90,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
+import { useSettingsStore } from '~/stores/settings';
 
-const settings = ref({
-  provider: '',
-  apiKey: '',
-  apiEndpoint: '',
-  theme: 'system'
-});
-
+const settingsStore = useSettingsStore();
 const showApiKey = ref(false);
 const showNotification = ref(false);
 
-// 从本地存储加载设置
-const loadSettings = () => {
-  const savedSettings = localStorage.getItem('data-loom-settings');
-  if (savedSettings) {
-    // Merge saved settings with defaults
-    settings.value = {
-      ...settings.value,
-      ...JSON.parse(savedSettings)
-    };
-  }
-};
+// 切换 API Key 可见性
+const toggleApiKeyVisibility = () => 
+  showApiKey.value = !showApiKey.value;
 
-// 保存设置到本地存储
+// 保存设置
 const saveSettings = () => {
-  localStorage.setItem('data-loom-settings', JSON.stringify(settings.value));
-  
-  // Show notification
+  // 由于使用了 Pinia 的持久化插件，设置会自动保存
+  // 这里只需显示通知
   showNotification.value = true;
   setTimeout(() => {
     showNotification.value = false;
   }, 3000);
 };
-
-// 切换 API Key 可见性
-const toggleApiKeyVisibility = () => {
-  showApiKey.value = !showApiKey.value;
-};
-
-// 页面加载时读取设置
-onMounted(() => {
-  loadSettings();
-});
 
 definePageMeta({
   layout: 'default'
