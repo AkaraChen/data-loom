@@ -64,22 +64,40 @@
           {{ isPreviewMode ? '预览' : '源码' }}
         </button>
       </div>
-      <button
-        class="btn btn-sm gap-1"
-        :class="isProcessing ? 'btn-error' : 'btn-primary'"
-        :disabled="!activeFile || disabled"
-        @click="isProcessing ? $emit('abort-process') : $emit('process-file')"
-      >
-        <Icon :name="isProcessing ? 'mdi:stop' : 'mdi:play'" size="16" />
-        {{ isProcessing ? '停止处理' : '处理' }}
-      </button>
+      <div class="flex gap-2">
+        <button
+          class="btn btn-sm btn-outline gap-1"
+          :disabled="!activeFile || disabled"
+          @click="handleExport"
+        >
+          <Icon name="mdi:export" size="16" />
+          导出
+        </button>
+        <button
+          class="btn btn-sm gap-1"
+          :class="isProcessing ? 'btn-error' : 'btn-primary'"
+          :disabled="!activeFile || disabled"
+          @click="isProcessing ? $emit('abort-process') : $emit('process-file')"
+        >
+          <Icon :name="isProcessing ? 'mdi:stop' : 'mdi:play'" size="16" />
+          {{ isProcessing ? '停止处理' : '处理' }}
+        </button>
+      </div>
     </div>
   </div>
+
+  <!-- 导出文件对话框 -->
+  <EditorExportFileDialog
+    ref="exportFileDialog"
+    :file="activeFile ? createFileFromActiveFile() : null"
+    @exported="handleExported"
+  />
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import EditorPreview from './preview/index.vue'
+import EditorExportFileDialog from './export-file-dialog.vue'
 
 // 文档文件接口
 interface DocumentFile {
@@ -101,12 +119,10 @@ const props = defineProps<{
 const modelValue = defineModel<string>('modelValue')
 
 // 定义事件
-const emit = defineEmits<{
-  (e: 'toggle-preview'): void
-  (e: 'process-file'): void
-  (e: 'abort-process'): void
-  (e: 'close-file'): void
-}>()
+const emit = defineEmits(['toggle-preview', 'process-file', 'abort-process', 'close-file'])
+
+// 导出对话框引用
+const exportFileDialog = ref<{ open: () => void } | null>(null)
 
 // 计算当前活动文件
 const activeFile = computed(() => {
@@ -115,16 +131,63 @@ const activeFile = computed(() => {
 })
 
 // 获取文件扩展名
-const getFileExtension = (fileName: string): string => {
-  const lastDotIndex = fileName.lastIndexOf('.')
-  if (lastDotIndex === -1) return 'txt'
-  return fileName.substring(lastDotIndex + 1).toLowerCase()
+function getFileExtension(fileName: string): string {
+  const ext = fileName.split('.').pop()?.toLowerCase() || ''
+  
+  // 根据扩展名返回对应的语言
+  if (ext === 'md' || ext === 'markdown') return 'markdown'
+  if (ext === 'js') return 'javascript'
+  if (ext === 'ts') return 'typescript'
+  if (ext === 'html') return 'html'
+  if (ext === 'css') return 'css'
+  if (ext === 'json') return 'json'
+  if (ext === 'yaml' || ext === 'yml') return 'yaml'
+  if (ext === 'csv') return 'csv'
+  
+  return ext
+}
+
+// 获取文件内容类型
+function getFileContentType(fileName: string): string {
+  const ext = fileName.split('.').pop()?.toLowerCase() || ''
+  
+  // 根据扩展名返回对应的MIME类型
+  if (ext === 'md' || ext === 'markdown') return 'text/markdown'
+  if (ext === 'js') return 'application/javascript'
+  if (ext === 'ts') return 'application/typescript'
+  if (ext === 'html') return 'text/html'
+  if (ext === 'css') return 'text/css'
+  if (ext === 'json') return 'application/json'
+  if (ext === 'yaml' || ext === 'yml') return 'application/yaml'
+  if (ext === 'csv') return 'text/csv'
+  
+  return 'text/plain'
+}
+
+// 创建文件对象
+function createFileFromActiveFile(): File {
+  if (!activeFile.value) throw new Error('No active file')
+  return new File(
+    [modelValue.value || ''], 
+    activeFile.value.name, 
+    { type: getFileContentType(activeFile.value.name) }
+  )
+}
+
+// 处理导出
+function handleExport() {
+  exportFileDialog.value?.open()
+}
+
+// 处理导出完成
+function handleExported() {
+  // 可以添加导出成功的提示或其他逻辑
 }
 </script>
 
 <style scoped>
 /* 用于触发 nuxt font */
 .not-exist-class {
-  font-family: 'Space Mono', monospace;
+  font-family: 'Space Mono', 'Noto Sans SC';
 }
 </style>
