@@ -17,7 +17,10 @@
     "@vueuse/core": "^13.0.0",
     "@vueuse/nuxt": "13.0.0",
     "csv-to-markdown-table": "^1.5.0",
+    "docx": "^9.3.0",
+    "file-saver": "^2.0.5",
     "github-markdown-css": "^5.8.1",
+    "js-yaml": "^4.1.0",
     "marked": "^15.0.7",
     "monaco-editor": "*",
     "nuxt": "^3.16.1",
@@ -27,7 +30,8 @@
     "pinia-plugin-persistedstate": "^4.2.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
-    "vue3-json-viewer": "^2.3.0"
+    "vue3-json-viewer": "^2.3.0",
+    "xlsx": "^0.18.5"
   },
   "packageManager": "pnpm@10.7.0+sha512.6b865ad4b62a1d9842b61d674a393903b871d9244954f652b8842c2b553c72176b278f64c463e52d40fff8aba385c235c8c9ecf5cc7de4fd78b8bb6d49633ab6",
   "devDependencies": {
@@ -35,6 +39,8 @@
     "@iconify-json/mdi": "^1.2.3",
     "@pinia/nuxt": "^0.10.1",
     "@tailwindcss/vite": "^4.0.17",
+    "@types/file-saver": "^2.0.7",
+    "@types/js-yaml": "^4.0.9",
     "daisyui": "^5.0.9",
     "prettier": "3.5.3",
     "tailwind-scrollbar": "^4.0.1",
