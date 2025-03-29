@@ -50,6 +50,7 @@ export interface ChatResponse {
 export function useChat(options: ChatOptions = {}) {
   const settingsStore = useSettingsStore()
   const { getClient } = useOpenAI()
+  const toast = useToast()
   const streamedText = ref('')
 
   // Reset streamed text
@@ -109,6 +110,7 @@ export function useChat(options: ChatOptions = {}) {
         }
       } catch (error) {
         console.error('Chat error:', error)
+        toast.error(error instanceof Error ? error.message : 'An unknown error occurred')
         throw error
       }
     },

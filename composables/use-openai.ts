@@ -29,8 +29,10 @@ export function useOpenAI() {
    */
   const client = computed(() => {
     const apiKey = settingsStore.apiKey
+    const toast = useToast()
 
     if (!apiKey) {
+      toast.error('API key is not set. Please configure it in the settings.')
       throw new Error(
         'API key is not set. Please configure it in the settings.',
       )

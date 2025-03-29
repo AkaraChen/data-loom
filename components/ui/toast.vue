@@ -1,5 +1,5 @@
 <template>
-  <div class="toast toast-top toast-end z-50">
+  <div class="toast toast-bottom toast-end z-50">
     <div v-for="(toast, index) in toasts" :key="index" 
          :class="['alert', getAlertClass(toast.type)]">
       <div>

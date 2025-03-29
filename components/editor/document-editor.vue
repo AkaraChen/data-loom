@@ -51,6 +51,8 @@ import {
   findFileIndex,
 } from '~/utils/file'
 
+const toast = useToast()
+
 // 定义属性
 const props = defineProps({
   blocking: {
@@ -91,6 +93,7 @@ const handleFileSelect = (fileId: string) => {
   if (props.blocking) {
     // 如果处于阻塞状态，发出事件但不更新活动文件
     emit('fileSelectBlocked', fileId)
+    toast.error('当前处于阻塞状态，无法切换文件')
     return
   }
 
@@ -113,6 +116,7 @@ const createNewFile = (fileName: string) => {
     activeFileId.value = newFile.id
   } else {
     emit('fileSelectBlocked', newFile.id)
+    toast.error('当前处于阻塞状态，无法创建新文件')
   }
 }
 
@@ -120,6 +124,7 @@ const createNewFile = (fileName: string) => {
 const closeFile = () => {
   // 在 blocking 状态下禁止关闭文件
   if (props.blocking) {
+    toast.error('当前处于阻塞状态，无法关闭文件')
     return
   }
 

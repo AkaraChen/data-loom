@@ -9,6 +9,7 @@ import { useOpenAI } from '~/composables/use-openai'
 export function useModels() {
   const settingsStore = useSettingsStore()
   const { getClient, canCreateClient } = useOpenAI()
+  const toast = useToast()
 
   // Query for fetching models
   const modelsQuery = useQuery({
@@ -25,6 +26,7 @@ export function useModels() {
         return chatModels
       } catch (error) {
         console.error('Error fetching models:', error)
+        toast.error(error instanceof Error ? error.message : 'An unknown error occurred')
         throw error
       }
     },
