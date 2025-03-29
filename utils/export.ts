@@ -9,12 +9,7 @@ import { saveAs } from 'file-saver'
  * @param file File object to download
  */
 export function downloadFile(file: File): void {
-  const url = URL.createObjectURL(file)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = file.name
-  a.click()
-  URL.revokeObjectURL(url)
+  saveAs(file, file.name)
 }
 
 /**
