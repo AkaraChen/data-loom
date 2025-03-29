@@ -52,10 +52,10 @@ export function useChat(options: ChatOptions = {}) {
   const { getClient } = useOpenAI()
   const toast = useToast()
   const streamedText = ref('')
-  
+
   // Create a ref to store the current AbortController
   const abortController = ref<AbortController | null>(null)
-  
+
   // Flag to track if the abort was intentional
   const isIntentionalAbort = ref(false)
 
@@ -72,11 +72,11 @@ export function useChat(options: ChatOptions = {}) {
     }: ChatRequest): Promise<ChatResponse> => {
       try {
         resetStreamedText()
-        
+
         // Create a new AbortController for this request
         abortController.value = new AbortController()
         isIntentionalAbort.value = false
-        
+
         const openai = getClient()
         const messages: OpenAI.Chat.ChatCompletionMessageParam[] = []
 
@@ -95,13 +95,16 @@ export function useChat(options: ChatOptions = {}) {
         })
 
         // Create the stream with the AbortController signal
-        const stream = await openai.chat.completions.create({
-          model: settingsStore.model || 'gpt-3.5-turbo',
-          messages,
-          stream: true,
-        }, {
-          signal: abortController.value.signal,
-        })
+        const stream = await openai.chat.completions.create(
+          {
+            model: settingsStore.model || 'gpt-3.5-turbo',
+            messages,
+            stream: true,
+          },
+          {
+            signal: abortController.value.signal,
+          },
+        )
 
         // Process the stream
         for await (const chunk of stream) {
@@ -128,13 +131,15 @@ export function useChat(options: ChatOptions = {}) {
         if (!isIntentionalAbort.value) {
           console.error('Chat error:', error)
           toast.error(
-            error instanceof Error ? error.message : 'An unknown error occurred',
+            error instanceof Error
+              ? error.message
+              : 'An unknown error occurred',
           )
         }
-        
+
         // Clear the AbortController after error
         abortController.value = null
-        
+
         throw error
       }
     },
@@ -154,10 +159,10 @@ export function useChat(options: ChatOptions = {}) {
     if (chatMutation.isPending.value && abortController.value) {
       // Set the intentional abort flag
       isIntentionalAbort.value = true
-      
+
       // Abort the request
       abortController.value.abort()
-      
+
       // Use Vue Query's reset to clean up the mutation state
       chatMutation.reset()
     }
