@@ -1,9 +1,11 @@
 import * as XLSX from 'xlsx'
 import * as yaml from 'js-yaml'
 import { saveAs } from 'file-saver'
-import * as md2docx from '@adobe/helix-md2docx'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { toString } from 'mdast-util-to-string'
+import { unified } from 'unified'
+import markdown from 'remark-parse'
+import docx from 'remark-docx'
 
 /**
  * Download a file
@@ -71,12 +73,20 @@ export async function markdownToPlaintext(file: File): Promise<File> {
 export async function markdownToDocx(file: File): Promise<File> {
   // Get the content from the file
   const content = await getTextFromFile(file)
-  const buffer = await md2docx.md2docx(content)
+
+  // Setup unified processor with remark-parse and remark-docx
+  // @ts-expect-error fuck
+  const processor = unified().use(markdown).use(docx, { output: 'blob' })
+
+  // Process the markdown content
+  const doc = await processor.process(content)
+  const blob = (await doc.result) as Blob
+
   // Generate output filename
   const filename = generateOutputFilename(file.name, 'docx')
 
   // Create a File object
-  return new File([buffer], filename, {
+  return new File([blob], filename, {
     type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   })
 }

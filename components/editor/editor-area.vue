@@ -66,7 +66,7 @@
       </div>
       <div class="flex gap-2">
         <button
-          class="btn btn-sm btn-outline gap-1"
+          class="btn btn-sm btn-secondary gap-1"
           :disabled="!activeFile || disabled"
           @click="handleExport"
         >
@@ -119,7 +119,12 @@ const props = defineProps<{
 const modelValue = defineModel<string>('modelValue')
 
 // 定义事件
-const emit = defineEmits(['toggle-preview', 'process-file', 'abort-process', 'close-file'])
+const emit = defineEmits([
+  'toggle-preview',
+  'process-file',
+  'abort-process',
+  'close-file',
+])
 
 // 导出对话框引用
 const exportFileDialog = ref<{ open: () => void } | null>(null)
@@ -133,7 +138,7 @@ const activeFile = computed(() => {
 // 获取文件扩展名
 function getFileExtension(fileName: string): string {
   const ext = fileName.split('.').pop()?.toLowerCase() || ''
-  
+
   // 根据扩展名返回对应的语言
   if (ext === 'md' || ext === 'markdown') return 'markdown'
   if (ext === 'js') return 'javascript'
@@ -143,14 +148,14 @@ function getFileExtension(fileName: string): string {
   if (ext === 'json') return 'json'
   if (ext === 'yaml' || ext === 'yml') return 'yaml'
   if (ext === 'csv') return 'csv'
-  
+
   return ext
 }
 
 // 获取文件内容类型
 function getFileContentType(fileName: string): string {
   const ext = fileName.split('.').pop()?.toLowerCase() || ''
-  
+
   // 根据扩展名返回对应的MIME类型
   if (ext === 'md' || ext === 'markdown') return 'text/markdown'
   if (ext === 'js') return 'application/javascript'
@@ -160,18 +165,16 @@ function getFileContentType(fileName: string): string {
   if (ext === 'json') return 'application/json'
   if (ext === 'yaml' || ext === 'yml') return 'application/yaml'
   if (ext === 'csv') return 'text/csv'
-  
+
   return 'text/plain'
 }
 
 // 创建文件对象
 function createFileFromActiveFile(): File {
   if (!activeFile.value) throw new Error('No active file')
-  return new File(
-    [modelValue.value || ''], 
-    activeFile.value.name, 
-    { type: getFileContentType(activeFile.value.name) }
-  )
+  return new File([modelValue.value || ''], activeFile.value.name, {
+    type: getFileContentType(activeFile.value.name),
+  })
 }
 
 // 处理导出

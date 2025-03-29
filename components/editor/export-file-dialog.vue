@@ -7,9 +7,16 @@
           <label class="label">
             <span class="label-text">导出格式</span>
           </label>
-          <select v-model="selectedFormat" class="select select-bordered w-full">
+          <select
+            v-model="selectedFormat"
+            class="select select-bordered w-full"
+          >
             <option disabled value="">请选择导出格式</option>
-            <option v-for="format in availableFormats" :key="format.value" :value="format.value">
+            <option
+              v-for="format in availableFormats"
+              :key="format.value"
+              :value="format.value"
+            >
               {{ format.label }}
             </option>
           </select>
@@ -35,12 +42,12 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { 
-  markdownToPlaintext, 
-  markdownToDocx, 
-  csvToXlsx, 
-  jsonToYaml, 
-  downloadFile 
+import {
+  markdownToPlaintext,
+  markdownToDocx,
+  csvToXlsx,
+  jsonToYaml,
+  downloadFile,
 } from '~/utils/export'
 
 interface ExportFormat {
@@ -66,45 +73,45 @@ const emit = defineEmits(['exported'])
 // 可用的导出格式
 const availableFormats = computed(() => {
   if (!props.file) return []
-  
+
   const formats: ExportFormat[] = [
     {
       value: 'original',
       label: `原始格式 (${props.file.name})`,
-      handler: async (file) => file
-    }
+      handler: async file => file,
+    },
   ]
-  
+
   const fileName = props.file.name.toLowerCase()
-  
+
   // 根据文件类型添加可用的转换格式
   if (fileName.endsWith('.md') || fileName.endsWith('.markdown')) {
     formats.push(
       {
         value: 'plaintext',
         label: '纯文本 (.txt)',
-        handler: markdownToPlaintext
+        handler: markdownToPlaintext,
       },
       {
         value: 'docx',
         label: 'Word文档 (.docx)',
-        handler: markdownToDocx
-      }
+        handler: markdownToDocx,
+      },
     )
   } else if (fileName.endsWith('.csv')) {
     formats.push({
       value: 'xlsx',
       label: 'Excel表格 (.xlsx)',
-      handler: csvToXlsx
+      handler: csvToXlsx,
     })
   } else if (fileName.endsWith('.json')) {
     formats.push({
       value: 'yaml',
       label: 'YAML文件 (.yml)',
-      handler: jsonToYaml
+      handler: jsonToYaml,
     })
   }
-  
+
   return formats
 })
 
@@ -114,24 +121,31 @@ const open = () => {
   dialogRef.value?.showModal()
 }
 
+const toast = useToast()
+
 // 处理导出
 const handleExport = async () => {
   if (!props.file || !selectedFormat.value) return
-  
+
   try {
-    const format = availableFormats.value.find(f => f.value === selectedFormat.value)
+    const format = availableFormats.value.find(
+      f => f.value === selectedFormat.value,
+    )
     if (!format) return
-    
+
     const exportedFile = await format.handler(props.file)
     downloadFile(exportedFile)
     emit('exported', exportedFile)
   } catch (error) {
     console.error('导出失败:', error)
+    toast.error('导出失败，请重试')
+  } finally {
+    dialogRef.value?.close()
   }
 }
 
 // 暴露方法
 defineExpose({
-  open
+  open,
 })
 </script>
