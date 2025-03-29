@@ -26,7 +26,9 @@ export function useModels() {
         return chatModels
       } catch (error) {
         console.error('Error fetching models:', error)
-        toast.error(error instanceof Error ? error.message : 'An unknown error occurred')
+        toast.error(
+          error instanceof Error ? error.message : 'An unknown error occurred',
+        )
         throw error
       }
     },

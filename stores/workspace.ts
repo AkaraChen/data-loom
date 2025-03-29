@@ -20,7 +20,8 @@ export const DEFAULT_WORKSPACE = {
   files: [] as DocumentFile[],
   activeFileId: null as string | null,
   activeFileContent: '',
-  isStreaming: false,
+  isGenerating: false,
+  isProcessing: false,
   outputMode: 'markdown' as OutputMode,
   contextFileIds: [] as string[], // 添加上下文文件ID数组
 }
@@ -37,7 +38,8 @@ export const useWorkspaceStore = defineStore(
     const files = ref<DocumentFile[]>([...DEFAULT_WORKSPACE.files])
     const activeFileId = ref<string | null>(DEFAULT_WORKSPACE.activeFileId)
     const activeFileContent = ref(DEFAULT_WORKSPACE.activeFileContent)
-    const isStreaming = ref(DEFAULT_WORKSPACE.isStreaming)
+    const isGenerating = ref(DEFAULT_WORKSPACE.isGenerating)
+    const isProcessing = ref(DEFAULT_WORKSPACE.isProcessing)
     const outputMode = ref<OutputMode>(DEFAULT_WORKSPACE.outputMode)
     const contextFileIds = ref<string[]>([...DEFAULT_WORKSPACE.contextFileIds]) // 添加上下文文件ID数组
 
@@ -71,6 +73,9 @@ export const useWorkspaceStore = defineStore(
           return 'markdown' // 默认使用 markdown
       }
     })
+
+    // 计算属性：是否有任何流式传输正在进行
+    const isStreaming = computed(() => isGenerating.value || isProcessing.value)
 
     // 监听活动文件ID变化，自动同步内容
     watch(activeFileId, newId => {
@@ -188,7 +193,8 @@ export const useWorkspaceStore = defineStore(
       files.value = [...DEFAULT_WORKSPACE.files]
       activeFileId.value = DEFAULT_WORKSPACE.activeFileId
       activeFileContent.value = DEFAULT_WORKSPACE.activeFileContent
-      isStreaming.value = DEFAULT_WORKSPACE.isStreaming
+      isGenerating.value = DEFAULT_WORKSPACE.isGenerating
+      isProcessing.value = DEFAULT_WORKSPACE.isProcessing
       outputMode.value = DEFAULT_WORKSPACE.outputMode
       contextFileIds.value = [...DEFAULT_WORKSPACE.contextFileIds] // 重置上下文文件ID数组
     }
@@ -220,8 +226,9 @@ export const useWorkspaceStore = defineStore(
       files,
       activeFileId,
       activeFileContent,
+      isGenerating,
+      isProcessing,
       isStreaming,
-      activeFile,
       outputMode,
       currentOutputMode,
       contextFileIds,

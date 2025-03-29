@@ -13,10 +13,10 @@ export function useToast() {
     // 添加唯一 ID
     const id = nextId++
     const toastWithId = { ...toast, id }
-    
+
     // 添加 toast 到列表
     toasts.value.push(toastWithId)
-    
+
     // 确保只在客户端执行
     if (import.meta.client) {
       // 设置自动移除
@@ -26,7 +26,7 @@ export function useToast() {
       }, duration)
     }
   }
-  
+
   // 移除指定 ID 的 toast
   const removeToast = (id: number) => {
     const index = toasts.value.findIndex(t => t.id === id)
@@ -59,6 +59,6 @@ export function useToast() {
     info,
     success,
     warning,
-    error
+    error,
   }
 }

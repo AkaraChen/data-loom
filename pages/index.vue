@@ -21,16 +21,16 @@
       <!-- Action Button -->
       <button
         class="btn btn-primary w-full gap-2"
-        @click="generateContent"
-        :disabled="workspaceStore.isStreaming"
+        @click="workspaceStore.isGenerating ? abortChat() : generateContent()"
+        :disabled="workspaceStore.isProcessing"
       >
         <Icon
-          v-if="!workspaceStore.isStreaming"
+          v-if="!workspaceStore.isGenerating"
           name="mdi:play-circle-outline"
           size="20"
         />
-        <span v-else class="loading loading-spinner loading-sm"></span>
-        {{ workspaceStore.isStreaming ? '生成中...' : '生成' }}
+        <Icon v-else name="mdi:stop-circle-outline" size="20" />
+        {{ workspaceStore.isGenerating ? '停止生成' : '生成' }}
       </button>
     </div>
 
@@ -40,8 +40,10 @@
       v-model:activeFileId="workspaceStore.activeFileId"
       v-model:activeFileContent="workspaceStore.activeFileContent"
       v-model:contextFileIds="workspaceStore.contextFileIds"
-      :blocking="workspaceStore.isStreaming"
+      :isGenerating="workspaceStore.isGenerating"
+      :isProcessing="workspaceStore.isProcessing"
       @process="handleProcessFile"
+      @abortProcess="abortProcess"
       @fileSelectBlocked="handleFileSelectBlocked"
     />
   </div>
@@ -98,12 +100,13 @@ const {
 })
 
 // 监听流式传输状态变化
-watch(
-  () => isStreaming.value || isProcessing.value,
-  newValue => {
-    workspaceStore.isStreaming = newValue
-  },
-)
+watch(isStreaming, newValue => {
+  workspaceStore.isGenerating = newValue
+})
+
+watch(isProcessing, newValue => {
+  workspaceStore.isProcessing = newValue
+})
 
 // 检查 API 配置是否完整
 const checkApiConfig = () => {
@@ -111,12 +114,12 @@ const checkApiConfig = () => {
     toast.warning('请在设置中配置 API 密钥')
     return false
   }
-  
+
   if (!settingsStore.model) {
     toast.warning('请在设置中配置模型')
     return false
   }
-  
+
   return true
 }
 

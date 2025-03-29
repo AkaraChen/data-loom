@@ -15,7 +15,7 @@
       </div>
     </div>
     <slot />
-    
+
     <!-- Toast 组件 -->
     <UiToast />
   </div>

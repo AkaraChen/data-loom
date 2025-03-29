@@ -5,7 +5,7 @@
       :files="files"
       :active-file-id="activeFileId"
       v-model:contextFileIds="contextFileIds"
-      :disabled="blocking"
+      :disabled="isGenerating || isProcessing"
       @select-file="handleFileSelect"
       @new-file="showNewFileDialog"
       @delete-file="handleDeleteFile"
@@ -19,9 +19,11 @@
       :active-file-id="activeFileId"
       v-model="activeFileContent"
       :is-preview-mode="isPreviewMode"
-      :disabled="blocking"
+      :disabled="isGenerating"
+      :is-processing="isProcessing"
       @toggle-preview="togglePreviewMode"
       @process-file="handleProcessFile"
+      @abort-process="$emit('abortProcess')"
       @close-file="closeFile"
     />
   </div>
@@ -55,6 +57,14 @@ const toast = useToast()
 
 // 定义属性
 const props = defineProps({
+  isGenerating: {
+    type: Boolean,
+    default: false,
+  },
+  isProcessing: {
+    type: Boolean,
+    default: false,
+  },
   blocking: {
     type: Boolean,
     default: false,
@@ -62,7 +72,15 @@ const props = defineProps({
 })
 
 // 定义事件
-const emit = defineEmits(['process', 'fileSelectBlocked'])
+const emit = defineEmits<{
+  (e: 'update:files', files: DocumentFile[]): void
+  (e: 'update:activeFileId', id: string | null): void
+  (e: 'update:activeFileContent', content: string): void
+  (e: 'update:contextFileIds', ids: string[]): void
+  (e: 'process', data: { file: DocumentFile; action: any }): void
+  (e: 'abortProcess'): void
+  (e: 'fileSelectBlocked', fileId: string): void
+}>()
 
 // 使用 defineModel 暴露接口
 const files = defineModel<DocumentFile[]>('files', { default: () => [] })
@@ -90,10 +108,9 @@ const renamingFileId = ref<string | null>(null)
 
 // 处理文件选择
 const handleFileSelect = (fileId: string) => {
-  if (props.blocking) {
-    // 如果处于阻塞状态，发出事件但不更新活动文件
+  // 在生成或处理过程中禁止切换文件
+  if (props.isGenerating || props.isProcessing) {
     emit('fileSelectBlocked', fileId)
-    toast.error('当前处于阻塞状态，无法切换文件')
     return
   }
 
@@ -122,9 +139,8 @@ const createNewFile = (fileName: string) => {
 
 // 关闭文件
 const closeFile = () => {
-  // 在 blocking 状态下禁止关闭文件
-  if (props.blocking) {
-    toast.error('当前处于阻塞状态，无法关闭文件')
+  // 在生成或处理状态下禁止关闭文件
+  if (props.isGenerating || props.isProcessing) {
     return
   }
 

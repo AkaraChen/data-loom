@@ -110,7 +110,9 @@ export function useChat(options: ChatOptions = {}) {
         }
       } catch (error) {
         console.error('Chat error:', error)
-        toast.error(error instanceof Error ? error.message : 'An unknown error occurred')
+        toast.error(
+          error instanceof Error ? error.message : 'An unknown error occurred',
+        )
         throw error
       }
     },

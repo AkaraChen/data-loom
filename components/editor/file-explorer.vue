@@ -2,7 +2,12 @@
   <div class="w-64 bg-base-100 border-r border-base-300 flex flex-col h-full">
     <!-- Document List Section - Max 2/3 height -->
     <div class="flex flex-col h-full max-h-[66%] min-h-[200px] p-4">
-      <div :class="['flex items-center justify-between mb-2', { 'opacity-50 pointer-events-none': disabled}]">
+      <div
+        :class="[
+          'flex items-center justify-between mb-2',
+          { 'opacity-50 pointer-events-none': disabled },
+        ]"
+      >
         <h2 class="font-medium flex items-center gap-2">
           <Icon name="mdi:folder-outline" size="20" class="text-primary" />
           文档列表

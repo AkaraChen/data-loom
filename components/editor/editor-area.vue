@@ -26,7 +26,7 @@
         v-if="isPreviewMode && activeFile"
         v-model="modelValue"
         :fileType="getFileExtension(activeFile?.name || '')"
-        :isStreaming="disabled"
+        :isStreaming="disabled || isProcessing"
       />
       <MonacoEditor
         v-else-if="activeFile"
@@ -65,12 +65,13 @@
         </button>
       </div>
       <button
-        class="btn btn-sm btn-primary gap-1"
+        class="btn btn-sm gap-1"
+        :class="isProcessing ? 'btn-error' : 'btn-primary'"
         :disabled="!activeFile || disabled"
-        @click="$emit('process-file')"
+        @click="isProcessing ? $emit('abort-process') : $emit('process-file')"
       >
-        <Icon name="mdi:play" size="16" />
-        处理
+        <Icon :name="isProcessing ? 'mdi:stop' : 'mdi:play'" size="16" />
+        {{ isProcessing ? '停止处理' : '处理' }}
       </button>
     </div>
   </div>
@@ -93,13 +94,19 @@ const props = defineProps<{
   activeFileId: string | null
   isPreviewMode: boolean
   disabled: boolean
+  isProcessing: boolean
 }>()
 
 // 使用 defineModel 处理 v-model
 const modelValue = defineModel<string>('modelValue')
 
 // 定义事件
-defineEmits(['toggle-preview', 'process-file', 'close-file'])
+const emit = defineEmits<{
+  (e: 'toggle-preview'): void
+  (e: 'process-file'): void
+  (e: 'abort-process'): void
+  (e: 'close-file'): void
+}>()
 
 // 计算当前活动文件
 const activeFile = computed(() => {

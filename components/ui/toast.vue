@@ -1,9 +1,16 @@
 <template>
   <div class="toast toast-bottom toast-end z-50">
-    <div v-for="(toast, index) in toasts" :key="index" 
-         :class="['alert', getAlertClass(toast.type)]">
+    <div
+      v-for="(toast, index) in toasts"
+      :key="index"
+      :class="['alert', getAlertClass(toast.type)]"
+    >
       <div>
-        <Icon v-if="toast.type" :name="getIconName(toast.type)" class="w-6 h-6 mr-2" />
+        <Icon
+          v-if="toast.type"
+          :name="getIconName(toast.type)"
+          class="w-6 h-6 mr-2"
+        />
         <span>{{ toast.message }}</span>
       </div>
     </div>
