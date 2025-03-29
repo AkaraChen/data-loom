@@ -37,7 +37,10 @@ export function getTextFromFile(file: File): Promise<string> {
  * @param targetExtension Target file extension (without dot)
  * @returns New filename with the target extension
  */
-function generateOutputFilename(inputFilename: string, targetExtension: string): string {
+function generateOutputFilename(
+  inputFilename: string,
+  targetExtension: string,
+): string {
   // Remove the original extension and add the new one
   return `${inputFilename.replace(/\.[^/.]+$/, '')}.${targetExtension}`
 }
@@ -50,10 +53,10 @@ function generateOutputFilename(inputFilename: string, targetExtension: string):
 export async function markdownToPlaintext(file: File): Promise<File> {
   // Get the content from the file
   const markdown = await getTextFromFile(file)
-  
+
   // Generate output filename
   const filename = generateOutputFilename(file.name, 'txt')
-  
+
   // Use marked to convert markdown to HTML
   const html = marked(markdown, { async: false })
 
@@ -76,10 +79,10 @@ export async function markdownToPlaintext(file: File): Promise<File> {
 export async function markdownToDocx(file: File): Promise<File> {
   // Get the content from the file
   const markdown = await getTextFromFile(file)
-  
+
   // Generate output filename
   const filename = generateOutputFilename(file.name, 'docx')
-  
+
   // Use marked to convert markdown to HTML
   const html = marked(markdown, { async: false })
 
@@ -125,10 +128,10 @@ export async function markdownToDocx(file: File): Promise<File> {
 export async function csvToXlsx(file: File): Promise<File> {
   // Get the content from the file
   const csvContent = await getTextFromFile(file)
-  
+
   // Generate output filename
   const filename = generateOutputFilename(file.name, 'xlsx')
-  
+
   // Parse CSV data
   const workbook = XLSX.read(csvContent, { type: 'string' })
 
@@ -149,25 +152,29 @@ export async function csvToXlsx(file: File): Promise<File> {
 export async function jsonToYaml(file: File): Promise<File> {
   // Get the content from the file
   const jsonContent = await getTextFromFile(file)
-  
+
   // Generate output filename
   const filename = generateOutputFilename(file.name, 'yml')
-  
+
   try {
     // Parse JSON
     const jsonObject = JSON.parse(jsonContent)
-    
+
     // Convert to YAML
     const yamlContent = yaml.dump(jsonObject, {
       indent: 2,
       lineWidth: -1, // No line wrapping
       noRefs: true, // Don't output YAML references
     })
-    
+
     // Create a File object
-    return new File([yamlContent], filename, { type: 'text/yaml;charset=utf-8' })
+    return new File([yamlContent], filename, {
+      type: 'text/yaml;charset=utf-8',
+    })
   } catch (error) {
-    throw new Error(`Failed to parse JSON: ${error instanceof Error ? error.message : String(error)}`)
+    throw new Error(
+      `Failed to parse JSON: ${error instanceof Error ? error.message : String(error)}`,
+    )
   }
 }
 
@@ -183,7 +190,10 @@ export async function jsonToYaml(file: File): Promise<File> {
  * @param filename Output filename
  * @returns File object with plaintext content
  */
-export function markdownStringToPlaintext(markdown: string, filename: string): File {
+export function markdownStringToPlaintext(
+  markdown: string,
+  filename: string,
+): File {
   // Use marked to convert markdown to HTML
   const html = marked(markdown, { async: false })
 
@@ -293,7 +303,7 @@ export function jsonStringToYamlFile(
   filename: string,
 ): File {
   const yamlContent = jsonStringToYamlString(jsonContent)
-  
+
   // Create a File object
   return new File([yamlContent], filename, { type: 'text/yaml;charset=utf-8' })
 }
