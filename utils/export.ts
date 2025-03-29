@@ -3,6 +3,7 @@ import * as XLSX from 'xlsx'
 import * as yaml from 'js-yaml'
 import { Document, Packer, Paragraph, TextRun } from 'docx'
 import { saveAs } from 'file-saver'
+import * as md2docx from '@adobe/helix-md2docx'
 
 /**
  * Download a file
@@ -73,41 +74,10 @@ export async function markdownToPlaintext(file: File): Promise<File> {
  */
 export async function markdownToDocx(file: File): Promise<File> {
   // Get the content from the file
-  const markdown = await getTextFromFile(file)
-
+  const content = await getTextFromFile(file)
+  const buffer = await md2docx.md2docx(content)
   // Generate output filename
   const filename = generateOutputFilename(file.name, 'docx')
-
-  // Use marked to convert markdown to HTML
-  const html = marked(markdown, { async: false })
-
-  // Create a temporary element to parse HTML
-  const tempElement = document.createElement('div')
-  tempElement.innerHTML = html
-
-  // Extract text content
-  const plaintext = tempElement.textContent || tempElement.innerText || ''
-
-  // Split plaintext into paragraphs
-  const paragraphs = plaintext.split('\n').filter(line => line.trim() !== '')
-
-  // Create a new document
-  const doc = new Document({
-    sections: [
-      {
-        properties: {},
-        children: paragraphs.map(
-          para =>
-            new Paragraph({
-              children: [new TextRun(para)],
-            }),
-        ),
-      },
-    ],
-  })
-
-  // Generate the DOCX file
-  const buffer = await Packer.toBuffer(doc)
 
   // Create a File object
   return new File([buffer], filename, {
@@ -171,134 +141,4 @@ export async function jsonToYaml(file: File): Promise<File> {
       `Failed to parse JSON: ${error instanceof Error ? error.message : String(error)}`,
     )
   }
-}
-
-/**
- * Convert string content to a specific format
- * These utility functions are kept for backward compatibility
- * and for cases where you already have the content as a string
- */
-
-/**
- * Convert Markdown string to plaintext
- * @param markdown Markdown content
- * @param filename Output filename
- * @returns File object with plaintext content
- */
-export function markdownStringToPlaintext(
-  markdown: string,
-  filename: string,
-): File {
-  // Use marked to convert markdown to HTML
-  const html = marked(markdown, { async: false })
-
-  // Create a temporary element to parse HTML
-  const tempElement = document.createElement('div')
-  tempElement.innerHTML = html
-
-  // Extract text content
-  const plaintext = tempElement.textContent || tempElement.innerText || ''
-
-  // Create a File object
-  return new File([plaintext], filename, { type: 'text/plain;charset=utf-8' })
-}
-
-/**
- * Convert Markdown string to DOCX format
- * @param markdown Markdown content
- * @param filename Output filename
- * @returns Promise resolving to a File object with DOCX content
- */
-export async function markdownStringToDocx(
-  markdown: string,
-  filename: string,
-): Promise<File> {
-  // Use marked to convert markdown to HTML
-  const html = marked(markdown, { async: false })
-
-  // Create a temporary element to parse HTML
-  const tempElement = document.createElement('div')
-  tempElement.innerHTML = html
-
-  // Extract text content
-  const plaintext = tempElement.textContent || tempElement.innerText || ''
-
-  // Split plaintext into paragraphs
-  const paragraphs = plaintext.split('\n').filter(line => line.trim() !== '')
-
-  // Create a new document
-  const doc = new Document({
-    sections: [
-      {
-        properties: {},
-        children: paragraphs.map(
-          para =>
-            new Paragraph({
-              children: [new TextRun(para)],
-            }),
-        ),
-      },
-    ],
-  })
-
-  // Generate the DOCX file
-  const buffer = await Packer.toBuffer(doc)
-
-  // Create a File object
-  return new File([buffer], filename, {
-    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  })
-}
-
-/**
- * Convert CSV string to XLSX format
- * @param csvContent CSV content
- * @param filename Output filename
- * @returns File object with XLSX content
- */
-export function csvStringToXlsx(csvContent: string, filename: string): File {
-  // Parse CSV data
-  const workbook = XLSX.read(csvContent, { type: 'string' })
-
-  // Generate XLSX file
-  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
-
-  // Create a File object
-  return new File([excelBuffer], filename, {
-    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  })
-}
-
-/**
- * Convert JSON string or object to YAML string
- * @param jsonContent JSON content (string or object)
- * @returns YAML content as string
- */
-export function jsonStringToYamlString(jsonContent: string | object): string {
-  // Parse JSON if it's a string
-  const jsonObject =
-    typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent
-
-  // Convert to YAML
-  return yaml.dump(jsonObject, {
-    indent: 2,
-    lineWidth: -1, // No line wrapping
-    noRefs: true, // Don't output YAML references
-  })
-}
-
-/**
- * Convert JSON string or object to YAML file
- * @param jsonContent JSON content (string or object)
- * @param filename Output filename
- * @returns File object with YAML content
- */
-export function jsonStringToYamlFile(
-  jsonContent: string | object,
-  filename: string,
-): File {
-  const yamlContent = jsonStringToYamlString(jsonContent)
-
-  // Create a File object
-  return new File([yamlContent], filename, { type: 'text/yaml;charset=utf-8' })
 }
