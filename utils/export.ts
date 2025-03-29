@@ -1,9 +1,9 @@
-import { marked } from 'marked'
 import * as XLSX from 'xlsx'
 import * as yaml from 'js-yaml'
-import { Document, Packer, Paragraph, TextRun } from 'docx'
 import { saveAs } from 'file-saver'
 import * as md2docx from '@adobe/helix-md2docx'
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import { toString } from 'mdast-util-to-string'
 
 /**
  * Download a file
@@ -53,15 +53,11 @@ export async function markdownToPlaintext(file: File): Promise<File> {
   // Generate output filename
   const filename = generateOutputFilename(file.name, 'txt')
 
-  // Use marked to convert markdown to HTML
-  const html = marked(markdown, { async: false })
+  // Parse markdown to AST
+  const mdast = fromMarkdown(markdown)
 
-  // Create a temporary element to parse HTML
-  const tempElement = document.createElement('div')
-  tempElement.innerHTML = html
-
-  // Extract text content
-  const plaintext = tempElement.textContent || tempElement.innerText || ''
+  // Convert AST to plain text
+  const plaintext = toString(mdast)
 
   // Create a File object
   return new File([plaintext], filename, { type: 'text/plain;charset=utf-8' })
