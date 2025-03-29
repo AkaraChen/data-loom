@@ -52,6 +52,12 @@ export function useChat(options: ChatOptions = {}) {
   const { getClient } = useOpenAI()
   const toast = useToast()
   const streamedText = ref('')
+  
+  // Create a ref to store the current AbortController
+  const abortController = ref<AbortController | null>(null)
+  
+  // Flag to track if the abort was intentional
+  const isIntentionalAbort = ref(false)
 
   // Reset streamed text
   const resetStreamedText = () => {
@@ -66,7 +72,11 @@ export function useChat(options: ChatOptions = {}) {
     }: ChatRequest): Promise<ChatResponse> => {
       try {
         resetStreamedText()
-
+        
+        // Create a new AbortController for this request
+        abortController.value = new AbortController()
+        isIntentionalAbort.value = false
+        
         const openai = getClient()
         const messages: OpenAI.Chat.ChatCompletionMessageParam[] = []
 
@@ -84,11 +94,13 @@ export function useChat(options: ChatOptions = {}) {
           content,
         })
 
-        // Create the stream
+        // Create the stream with the AbortController signal
         const stream = await openai.chat.completions.create({
           model: settingsStore.model || 'gpt-3.5-turbo',
           messages,
           stream: true,
+        }, {
+          signal: abortController.value.signal,
         })
 
         // Process the stream
@@ -104,23 +116,49 @@ export function useChat(options: ChatOptions = {}) {
           }
         }
 
+        // Clear the AbortController after successful completion
+        abortController.value = null
+
         return {
           text: streamedText.value,
           isComplete: true,
         }
       } catch (error) {
-        console.error('Chat error:', error)
-        toast.error(
-          error instanceof Error ? error.message : 'An unknown error occurred',
-        )
+        // Don't show error toast if it was an intentional abort
+        if (!isIntentionalAbort.value) {
+          console.error('Chat error:', error)
+          toast.error(
+            error instanceof Error ? error.message : 'An unknown error occurred',
+          )
+        }
+        
+        // Clear the AbortController after error
+        abortController.value = null
+        
         throw error
       }
+    },
+    // Use Vue Query's retry option to prevent automatic retries on aborted requests
+    retry: (failureCount, error) => {
+      // Don't retry if it was an intentional abort
+      if (isIntentionalAbort.value) {
+        return false
+      }
+      // Otherwise use default retry logic (typically 3 retries)
+      return failureCount < 3
     },
   })
 
   // Abort current stream
   const abortChat = () => {
-    if (chatMutation.isPending.value) {
+    if (chatMutation.isPending.value && abortController.value) {
+      // Set the intentional abort flag
+      isIntentionalAbort.value = true
+      
+      // Abort the request
+      abortController.value.abort()
+      
+      // Use Vue Query's reset to clean up the mutation state
       chatMutation.reset()
     }
   }
