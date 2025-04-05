@@ -55,7 +55,6 @@ import { useWorkspaceStore, type DocumentFile } from '~/stores/workspace'
 import { useSettingsStore } from '~/stores/settings'
 import { useToast } from '~/composables/use-toast'
 import { watch } from 'vue'
-import { useRuntimeConfig } from '#imports'
 
 definePageMeta({
   layout: 'default',
