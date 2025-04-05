@@ -49,7 +49,7 @@ export interface ChatResponse {
  */
 export function useChat(options: ChatOptions = {}) {
   const settingsStore = useSettingsStore()
-  const { getClient } = useOpenAI()
+  const { getClient, getModel } = useOpenAI()
   const toast = useToast()
   const streamedText = ref('')
 
@@ -97,7 +97,7 @@ export function useChat(options: ChatOptions = {}) {
         // Create the stream with the AbortController signal
         const stream = await openai.chat.completions.create(
           {
-            model: settingsStore.model || 'gpt-3.5-turbo',
+            model: getModel() || 'gpt-3.5-turbo',
             messages,
             stream: true,
           },

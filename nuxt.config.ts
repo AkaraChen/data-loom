@@ -18,4 +18,15 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
   ssr: false,
+
+  // 托管模式配置
+  runtimeConfig: {
+    public: {
+      managedMode: false,
+      apiProvider: 'openai',
+      apiKey: '',
+      apiEndpoint: '',
+      model: '',
+    },
+  },
 })

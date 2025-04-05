@@ -6,8 +6,14 @@
     </div>
 
     <div class="grid grid-cols-1 gap-4">
+      <!-- 托管模式提示 -->
+      <div v-if="isManagedMode" class="alert alert-success shadow-sm">
+        <Icon name="mdi:information" size="20" />
+        <span>应用当前处于托管模式，API 设置由系统管理员配置。</span>
+      </div>
+
       <!-- API Settings Section -->
-      <SettingsSection title="API 设置" icon="mdi:api">
+      <SettingsSection v-if="!isManagedMode" title="API 设置" icon="mdi:api">
         <SettingsItem
           title="模型供应商"
           description="选择你想要使用的 AI 模型供应商"
@@ -121,6 +127,8 @@
 <script setup>
 import { useToggle } from '@vueuse/core'
 import { useModels } from '~/composables/use-models'
+import { useRuntimeConfig } from '#imports'
+import { computed } from 'vue'
 
 const settingsStore = useSettingsStore()
 
@@ -133,6 +141,10 @@ const {
 
 // 切换 API Key 可见性
 const [showApiKey, toggleApiKeyVisibility] = useToggle(false)
+
+const isManagedMode = computed(
+  () => useRuntimeConfig().public.managedMode === true,
+)
 
 definePageMeta({
   layout: 'default',

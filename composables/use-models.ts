@@ -8,20 +8,21 @@ import { useOpenAI } from '~/composables/use-openai'
  */
 export function useModels() {
   const settingsStore = useSettingsStore()
-  const { getClient, canCreateClient } = useOpenAI()
+  const { getClient, canCreateClient, getApiKey, getApiEndpoint } = useOpenAI()
   const toast = useToast()
 
   // Query for fetching models
   const modelsQuery = useQuery({
-    queryKey: ['models', settingsStore.apiKey, settingsStore.apiEndpoint],
+    queryKey: ['models', getApiKey(), getApiEndpoint()],
     queryFn: async () => {
       try {
         const openai = getClient()
         const response = await openai.models.list()
 
         // Filter for chat completion models and sort by ID
-        const chatModels = response.data
-          .sort((a, b) => a.id.localeCompare(b.id))
+        const chatModels = response.data.sort((a, b) =>
+          a.id.localeCompare(b.id),
+        )
         return chatModels
       } catch (error) {
         console.error('Error fetching models:', error)
@@ -31,7 +32,7 @@ export function useModels() {
         throw error
       }
     },
-    // Only run the query if we have an API key
+    // Only run the query if we can create a client
     enabled: canCreateClient,
     // Cache the result for 1 hour
     staleTime: 60 * 60 * 1000,

@@ -55,6 +55,7 @@ import { useWorkspaceStore, type DocumentFile } from '~/stores/workspace'
 import { useSettingsStore } from '~/stores/settings'
 import { useToast } from '~/composables/use-toast'
 import { watch } from 'vue'
+import { useRuntimeConfig } from '#imports'
 
 definePageMeta({
   layout: 'default',
@@ -110,13 +111,15 @@ watch(isProcessing, newValue => {
 
 // 检查 API 配置是否完整
 const checkApiConfig = () => {
-  if (!settingsStore.apiKey) {
-    toast.warning('请在设置中配置 API 密钥')
-    return false
+  const config = useRuntimeConfig()
+
+  // 托管模式下直接返回 true
+  if (config.public.managedMode === true) {
+    return true
   }
 
-  if (!settingsStore.model) {
-    toast.warning('请在设置中配置模型')
+  if (!settingsStore.apiKey) {
+    toast.warning('请在设置中配置 API 密钥')
     return false
   }
 
