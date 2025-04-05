@@ -21,7 +21,6 @@ export function useModels() {
 
         // Filter for chat completion models and sort by ID
         const chatModels = response.data
-          .filter(model => model.id.includes('gpt'))
           .sort((a, b) => a.id.localeCompare(b.id))
         return chatModels
       } catch (error) {
