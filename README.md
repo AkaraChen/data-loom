@@ -1,75 +1,13 @@
-# Nuxt Minimal Starter
+# Data Loom ✨
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Data Loom is a powerful tool designed to simplify the creation of mock or presentation data using Large Language Models (LLMs). It streamlines the prompting process, making it easy to manage LLM context and ensure that generated data is consistently correct and coherent.
 
-## Setup
+## Features 🚀
 
-Make sure to install dependencies:
-
-```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+*   **LLM-Powered Data Generation**: Leverage the power of LLMs to generate diverse data. 🤖
+*   **Text Generation**: Create natural language text outputs. ✍️
+*   **Table Generation (XLSX)**: Generate structured data in XLSX format. 📊
+*   **Structured Data Generation (JSON)**: Produce structured data in JSON format. 🏗️
+*   **Simplified Prompting**: An intuitive approach to prompting LLMs for data generation. 💡
+*   **Context Management**: Easily manage LLM context for consistent and accurate outputs. 🧠
+*   **Consistent Data**: Ensure all created content is consistent with your requirements. ✅
